@@ -1,0 +1,5 @@
+lemonmind_grid_options_save:
+    resource: "@LemonmindGridOptionsSaveBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
