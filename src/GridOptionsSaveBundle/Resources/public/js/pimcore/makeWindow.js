@@ -4,7 +4,7 @@ function makeWindow(title, url, data, className, idList = []) {
         modal: true,
         layout: 'fit',
         width: 500,
-        height: 250,
+        height: 300,
         items: new Ext.form.Panel({
             layout: 'anchor',
             url: url,
@@ -23,27 +23,27 @@ function makeWindow(title, url, data, className, idList = []) {
                 displayField: 'optionName',
                 valueField: 'value',
                 allowBlank: false,
-                margin: '5'
+                margin: '10'
             }, {
                 xtype: 'textfield',
                 fieldLabel: 'Search',
                 name: 'search',
                 allowBlank: false,
-                margin: '5'
+                margin: '10'
             },
             {
                 xtype: 'textfield',
                 fieldLabel: 'Replace',
                 name: 'replace',
                 allowBlank: false,
-                margin: '5'
+                margin: '10'
             },
             {
                 xtype: 'checkboxfield',
                 boxLabel: 'Insensitive',
                 name: 'insensitive',
                 inputValue: '1',
-                margin: '7'
+                margin: '10'
             },
             {
                 xtype: 'hiddenfield',
@@ -60,9 +60,10 @@ function makeWindow(title, url, data, className, idList = []) {
                 text: 'Close',
                 handler: () => modal.hide(),
             }, {
-                text: 'Send',
+                text: 'Apply',
                 formBind: true,
                 disabled: true,
+                iconCls: 'x-btn-icon-el x-btn-icon-el-default-small pimcore_icon_apply',
                 handler: function () {
                     let form = this.up('form').getForm();
                     if (!form.isValid()) {

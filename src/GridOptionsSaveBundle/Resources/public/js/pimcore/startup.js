@@ -20,7 +20,16 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
         }
     });
 
-    fieldsToSelectData = fieldsToSelect.map(e => ({ value: e, optionName: e }))
+    const splitCamelCaseToString = (s) => {
+        return s
+            .split(/(?=[A-Z])/)
+            .map((p) => {
+                return p[0].toUpperCase() + p.slice(1);
+            })
+            .join(' ');
+    }
+
+    fieldsToSelectData = fieldsToSelect.map(e => ({ value: e, optionName: splitCamelCaseToString(e) }))
 
     menu.add({
         text: "String replace selected",
