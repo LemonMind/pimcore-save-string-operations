@@ -6,63 +6,88 @@ namespace Lemonmind\GridOptionsSaveBundle\Controller;
 
 use Exception;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
-use Pimcore\Model\DataObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @Route("/admin/string_replace")
+ */
 class GridOptionsController extends AdminController
 {
+    private string $field;
+    private string $search;
+    private string $replace;
+    private bool $isInsensitive;
+    private string $class;
+    private array $ids;
+
     /**
-     * @Route("/admin/string_replace")
+     * @Route("/selected")
      */
-    public function indexAction(Request $request): Response
+    public function selectedAction(Request $request): Response
     {
+        $this->getParams($request);
+        $productListing = new $this->class();
+        $productListing->addConditionParam('o_id IN (?)', [$this->ids]);
+        $this->stringReplace($productListing);
 
-        //$class = $request->get('class');
-        $className = "Car";
+        return $this->returnAction(true, '');
+    }
 
+    /**
+     * @Route("/all")
+     */
+    public function allAction(Request $request): Response
+    {
+        $this->getParams($request);
+        $productListing = new $this->class();
+        $this->stringReplace($productListing);
 
-        $prefix = "\Pimcore\Model\DataObject";
+        return $this->returnAction(true, '');
+    }
 
-        $arr = explode(' ', "\ $className");
-        $class = $prefix . $arr[0] . $arr[1] . '\Listing';
-        //dd($cos);
-        //       if (!class_exists($class)) {
-//            return $this->returnAction(false, 'Class does not exist');
-//        }
+    private function getParams(Request $request): void
+    {
+        $this->field = $request->get('field');
+        $this->search = $request->get('search');
+        $this->replace = $request->get('replace');
+        $className = $request->get('className');
+        $this->ids = explode(',', $request->get('idList'));
+        $this->isInsensitive = null !== $request->get('insensitive');
 
-        $productListing = new $class();
-
-        $data = [];
-
-        //dd($productListing);
-        foreach ($productListing as $product) {
-            try {
-//                $product->setName('some text');
-//                $product->save();
-            } catch (Exception $e) {
-                return $this->json(
-                    [
-                        'error' => $e->getMessage(),
-                    ],
-                    Response::HTTP_BAD_REQUEST
-                );
-            }
-            $data[] = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'price' => $product->getPrice(),
-            ];
+        if ($this->isInsensitive) {
+            $this->search = strtolower($this->search);
         }
 
+        $prefix = "\Pimcore\Model\DataObject";
+        $suffix = '\Listing';
+        $arr = explode(' ', "\ $className");
+        $this->class = $prefix . $arr[0] . $arr[1] . $suffix;
 
-        return $this->json(
-            [
-                'data' => $data,
-            ],
-            Response::HTTP_OK
-        );
+        if (!class_exists($this->class)) {
+            $this->returnAction(false, 'Class does not exist');
+        }
+    }
+
+    private function stringReplace($productListing): void
+    {
+        foreach ($productListing as $product) {
+            try {
+                $productField = $product->get($this->field);
+
+                if ($this->isInsensitive) {
+                    $productField = strtolower($productField);
+                }
+
+                if ($productField === $this->search) {
+                    $product->set($this->field, $this->replace);
+                    $product->save();
+                }
+            } catch (Exception $e) {
+                $this->returnAction(false, $e->getMessage());
+            }
+        }
     }
 
     private function returnAction(bool $success, string $msg): Response
