@@ -2,15 +2,16 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
     let menu = e.detail.menu
     let selectedRows = e.detail.selectedRows
 
-    console.log(menu)
-    console.log(selectedRows)
-
     if (selectedRows.length === 0) {
         return
     }
 
     const keys = Object.keys(selectedRows[0].data.inheritedFields)
-    const className = selectedRows[0].data.className
+    const className = selectedRows[0].data.classname
+
+    if (keys.length === 0) {
+        return
+    }
 
     let fieldsToSelect = []
     keys.forEach(key => {
@@ -19,12 +20,9 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
         }
     });
 
-    console.log(fieldsToSelect)
-
     fieldsToSelectData = fieldsToSelect.map(e => ({ value: e, optionName: e }))
 
     let idList = selectedRows.map(e => e.id)
-    console.log(idList)
 
     menu.add({
         text: "String replace selected",
@@ -44,7 +42,7 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
                     },
                     items: [{
                         xtype: 'combo',
-                        name: 'Field',
+                        name: 'field',
                         fieldLabel: 'Select Field:',
                         store: Ext.create('Ext.data.Store', {
                             fields: ['optionName', 'value'],
@@ -65,7 +63,7 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
                     {
                         xtype: 'textfield',
                         fieldLabel: 'Replace',
-                        name: 'reaplace',
+                        name: 'replace',
                         allowBlank: false,
                         margin: '5'
                     },
