@@ -56,10 +56,6 @@ class GridOptionsController extends AdminController
         $this->ids = explode(',', $request->get('idList'));
         $this->isInsensitive = null !== $request->get('insensitive');
 
-        if ($this->isInsensitive) {
-            $this->search = strtolower($this->search);
-        }
-
         $prefix = "\Pimcore\Model\DataObject";
         $suffix = '\Listing';
         $arr = explode(' ', "\ $className");
@@ -76,15 +72,17 @@ class GridOptionsController extends AdminController
             try {
                 $productField = $product->get($this->field);
 
-                if ($this->isInsensitive) {
-                    if (null !== $productField) {
-                        $productField = strtolower($productField);
+                if (null !== $productField) {
+                    if ($this->isInsensitive) {
+                        $productFieldReplaced = str_ireplace($this->search, $this->replace, $productField);
+                    } else {
+                        $productFieldReplaced = str_replace($this->search, $this->replace, $productField);
                     }
-                }
 
-                if ($productField === $this->search) {
-                    $product->set($this->field, $this->replace);
-                    $product->save();
+                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
+                        $product->set($this->field, $productFieldReplaced);
+                        $product->save();
+                    }
                 }
             } catch (Exception $e) {
                 $this->returnAction(false, $e->getMessage());
