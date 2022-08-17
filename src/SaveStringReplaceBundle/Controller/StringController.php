@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/string_replace")
  */
-class GridOptionsController extends AdminController
+class StringController extends AdminController
 {
     private string $field;
     private string $search;
