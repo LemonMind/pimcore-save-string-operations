@@ -5,8 +5,8 @@ It's Pimcore Bundle to replace strings permanently using Grid Options. It will s
 ## Installation
 
 ```
-composer require lemonmind/pimcore-string-replace
-bin/console pimcore:bundle:enable LemonmindGridOptionsSaveBundle
+composer require lemonmind/pimcore-save-string-replace
+bin/console pimcore:bundle:enable LemonmindSaveStringReplaceBundle
 ```
 
 After correct installation go to your object's folder and right click on one of the objects.
