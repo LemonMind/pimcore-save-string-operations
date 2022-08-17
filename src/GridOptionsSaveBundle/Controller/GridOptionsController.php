@@ -77,7 +77,9 @@ class GridOptionsController extends AdminController
                 $productField = $product->get($this->field);
 
                 if ($this->isInsensitive) {
-                    $productField = strtolower($productField);
+                    if (null !== $productField) {
+                        $productField = strtolower($productField);
+                    }
                 }
 
                 if ($productField === $this->search) {
