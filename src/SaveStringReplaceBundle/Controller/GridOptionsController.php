@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\GridOptionsSaveBundle\Controller;
+namespace Lemonmind\SaveStringReplaceBundle\Controller;
 
 use Exception;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
@@ -77,7 +77,9 @@ class GridOptionsController extends AdminController
                 $productField = $product->get($this->field);
 
                 if ($this->isInsensitive) {
-                    $productField = strtolower($productField);
+                    if (null !== $productField) {
+                        $productField = strtolower($productField);
+                    }
                 }
 
                 if ($productField === $this->search) {
