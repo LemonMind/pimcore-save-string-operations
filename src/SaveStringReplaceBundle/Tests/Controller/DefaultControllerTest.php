@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\GridOptionsSaveBundle\Tests\Controller;
+namespace Lemonmind\SaveStringReplaceBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\GridOptionsSaveBundle\Controller;
+namespace Lemonmind\SaveStringReplaceBundle\Controller;
 
 use Exception;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;

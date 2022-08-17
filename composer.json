@@ -1,5 +1,5 @@
 {
-  "name": "lemonmind/pimcore-string-replace",
+  "name": "lemonmind/pimcore-save-string-replace",
   "description": "It's Pimcore Bundle to replace strings permanently using Grid Options. It will save replaced strings directly in object",
   "type": "pimcore-bundle",
   "license": "GPL-3.0-or-later",
@@ -25,13 +25,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Lemonmind\\GridOptionsSaveBundle\\": "/src/GridOptionsSaveBundle"
+      "Lemonmind\\SaveStringReplaceBundle\\": "/src/SaveStringReplaceBundle"
     }
   },
   "extra": {
     "pimcore": {
       "bundles": [
-        "Lemonmind\\GridOptionsSaveBundle\\LemonmindGridOptionsSaveBundle"
+        "Lemonmind\\SaveStringReplaceBundle\\LemonmindSaveStringReplaceBundle"
       ]
     }
   },

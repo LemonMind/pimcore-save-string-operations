@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\GridOptionsSaveBundle\DependencyInjection;
+namespace Lemonmind\SaveStringReplaceBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class LemonmindGridOptionsSaveExtension extends Extension
+class LemonmindSaveStringReplaceExtension extends Extension
 {
     /**
      * {@inheritdoc}

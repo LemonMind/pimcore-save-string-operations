@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\GridOptionsSaveBundle\DependencyInjection;
+namespace Lemonmind\SaveStringReplaceBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -14,7 +14,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('lemonmind_grid_options_save');
+        $treeBuilder = new TreeBuilder('lemonmind_string_replace');
 
         return $treeBuilder;
     }
