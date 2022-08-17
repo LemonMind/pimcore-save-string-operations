@@ -1,41 +1,45 @@
 document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
-    let menu = e.detail.menu
-    let selectedRows = e.detail.selectedRows
-
-    if (selectedRows.length === 0) {
-        return
-    }
-
-    const keys = Object.keys(selectedRows[0].data.inheritedFields)
+    const menu = e.detail.menu
+    const selectedRows = e.detail.selectedRows
     const className = selectedRows[0].data.classname
+    const keys = Object.keys(selectedRows[0].data.inheritedFields)
 
     if (keys.length === 0) {
         return
     }
 
-    let fieldsToSelect = []
-    keys.forEach(key => {
-        if (typeof (selectedRows[0].data[key]) === "string") {
-            fieldsToSelect.push(key)
-        }
-    });
+    const columns = e.detail.object.columns
+    const allowedTypes = ['input', 'textarea', 'wysiwyg']
 
-    const splitCamelCaseToString = (s) => {
-        return s
-            .split(/(?=[A-Z])/)
-            .map((p) => {
-                return p[0].toUpperCase() + p.slice(1);
+    const columnsConfig = columns.reduce((arr, curr) => {
+        if (curr.config.layout) {
+            arr.push({
+                dataIndex: curr.config.dataIndex,
+                text: curr.config.text,
+                type: curr.config.layout.type
             })
-            .join(' ');
-    }
+        }
 
-    fieldsToSelectData = fieldsToSelect.map(e => ({ value: e, optionName: splitCamelCaseToString(e) }))
+        return arr;
+    }, []);
+
+    const selectedFieldsData = keys.reduce((arr, key) => {
+        let config = columnsConfig.find(c => c.dataIndex === key && allowedTypes.includes(c.type))
+        if (config) {
+            arr.push({
+                value: key,
+                optionName: config.text
+            })
+        }
+
+        return arr;
+    }, []);
 
     menu.add({
         text: "String replace selected",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
-            makeWindow('Replace selected', '/admin/string_replace/selected', fieldsToSelectData, className, selectedRows.map(e => e.id))
+            makeWindow('Replace selected', '/admin/string_replace/selected', selectedFieldsData, className, selectedRows.map(e => e.id))
         }
     });
 
@@ -43,7 +47,7 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
         text: "String replace all",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
-            makeWindow('Replace all', '/admin/string_replace/all', fieldsToSelectData, className)
+            makeWindow('Replace all', '/admin/string_replace/all', selectedFieldsData, className)
         }
     });
 
