@@ -16,7 +16,8 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
             arr.push({
                 dataIndex: curr.config.dataIndex,
                 text: curr.config.text,
-                type: curr.config.layout.type
+                type: curr.config.layout.type,
+                noteditable: curr.config.layout.layout.noteditable
             })
         }
 
@@ -24,7 +25,7 @@ document.addEventListener(pimcore.events.prepareOnRowContextmenu, async (e) => {
     }, []);
 
     const selectedFieldsData = keys.reduce((arr, key) => {
-        let config = columnsConfig.find(c => c.dataIndex === key && allowedTypes.includes(c.type))
+        let config = columnsConfig.find(c => c.dataIndex === key && allowedTypes.includes(c.type) && !c.noteditable)
         if (config) {
             arr.push({
                 value: key,
