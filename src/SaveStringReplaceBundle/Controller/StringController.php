@@ -28,9 +28,9 @@ class StringController extends AdminController
     public function selectedAction(Request $request): Response
     {
         $this->getParams($request);
-        $productListing = new $this->class();
-        $productListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $this->stringReplace($productListing);
+        $objectListing = new $this->class();
+        $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
+        $this->stringReplace($objectListing);
 
         return $this->returnAction(true, '');
     }
@@ -41,8 +41,8 @@ class StringController extends AdminController
     public function allAction(Request $request): Response
     {
         $this->getParams($request);
-        $productListing = new $this->class();
-        $this->stringReplace($productListing);
+        $objectListing = new $this->class();
+        $this->stringReplace($objectListing);
 
         return $this->returnAction(true, '');
     }
@@ -66,11 +66,11 @@ class StringController extends AdminController
         }
     }
 
-    private function stringReplace($productListing): void
+    private function stringReplace($objectListing): void
     {
-        foreach ($productListing as $product) {
+        foreach ($objectListing as $object) {
             try {
-                $productField = $product->get($this->field);
+                $productField = $object->get($this->field);
 
                 if (null !== $productField) {
                     if ($this->isInsensitive) {
@@ -80,8 +80,8 @@ class StringController extends AdminController
                     }
 
                     if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        $product->set($this->field, $productFieldReplaced);
-                        $product->save();
+                        $object->set($this->field, $productFieldReplaced);
+                        $object->save();
                     }
                 }
             } catch (Exception $e) {
