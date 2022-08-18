@@ -8,6 +8,7 @@ use Lemonmind\SaveStringReplaceBundle\Controller\StringController;
 use Lemonmind\SaveStringReplaceBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
+use Symfony\Component\HttpFoundation\Request;
 
 class StringControllerTest extends KernelTestCase
 {
@@ -51,6 +52,49 @@ class StringControllerTest extends KernelTestCase
             ['lorem ipsum', 'lorem', 'ipsum', 'ipsum ipsum', false, 10],
             ['loREm ipsum', 'lorem', 'ipsum', 'ipsum ipsum', true, 10],
             ['loREm ipsum', 'LOREm', 'ipsum', 'ipsum ipsum', true, 10],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider dataProviderParams
+     *
+     * @throws \ReflectionException
+     */
+    public function testgetParams(
+        string $field,
+        string $search,
+        string $replace,
+        string $className,
+        string $expectedClassName,
+        string $idList,
+        array $expectedIds,
+        ?string $insensitive,
+        bool $expectedIsInsensitive
+    ): void {
+        $request = $this->createStub(Request::class);
+        $request->method('get')
+            ->withConsecutive(['field'], ['search'], ['replace'], ['className'], ['idList'], ['insensitive'])
+            ->willReturnOnConsecutiveCalls($field, $search, $replace, $className, $idList, $insensitive);
+
+        $controller = new StringController();
+        $reflector = new ReflectionClass($controller);
+
+        $method = $reflector->getMethod('getParams');
+        $method->invokeArgs($controller, [$request, true]);
+
+        $this->assertSame($field, $reflector->getProperty('field')->getValue($controller));
+        $this->assertSame($search, $reflector->getProperty('search')->getValue($controller));
+        $this->assertSame($expectedClassName, $reflector->getProperty('class')->getValue($controller));
+        $this->assertSame($expectedIds, $reflector->getProperty('ids')->getValue($controller));
+        $this->assertSame($expectedIsInsensitive, $reflector->getProperty('isInsensitive')->getValue($controller));
+    }
+
+    public function dataProviderParams(): array
+    {
+        return [
+            ['name', 'lorem', 'ipsum', 'TestObject', "\Pimcore\Model\DataObject\TestObject\Listing", '1,2,3,4', ['1', '2', '3', '4'], null, false],
+            ['name', 'lorem', 'ipsum', 'TestObject', "\Pimcore\Model\DataObject\TestObject\Listing", '', [], '1', true],
         ];
     }
 }

@@ -47,13 +47,13 @@ class StringController extends AdminController
         return $this->returnAction(true, '');
     }
 
-    private function getParams(Request $request): void
+    private function getParams(Request $request, bool $test = false): void
     {
         $this->field = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
-        $this->ids = explode(',', $request->get('idList'));
+        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $this->isInsensitive = null !== $request->get('insensitive');
 
         $prefix = "\Pimcore\Model\DataObject";
@@ -62,6 +62,9 @@ class StringController extends AdminController
         $this->class = $prefix . $arr[0] . $arr[1] . $suffix;
 
         if (!class_exists($this->class)) {
+            if ($test) {
+                return;
+            }
             $this->returnAction(false, 'Class does not exist');
         }
     }
