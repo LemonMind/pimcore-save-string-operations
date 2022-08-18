@@ -5,36 +5,13 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringReplaceBundle\Tests\Controller;
 
 use Lemonmind\SaveStringReplaceBundle\Controller\StringController;
+use Lemonmind\SaveStringReplaceBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
 
-class TestProduct
-{
-    private string $name;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
-
-    public function get(): string
-    {
-        return $this->name;
-    }
-
-    public function set(string $field, string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function save(): void
-    {
-    }
-}
-
 class StringControllerTest extends KernelTestCase
 {
-    private array $productListing;
+    private array $objectListing;
 
     /**
      * @test
@@ -45,9 +22,9 @@ class StringControllerTest extends KernelTestCase
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {
         for ($i = 0; $i < $productNumber; ++$i) {
-            $this->productListing[] = new TestProduct($name);
+            $this->objectListing[] = new TestObject($name);
         }
-        $this->productListing[] = new TestProduct('different name');
+        $this->objectListing[] = new TestObject('different name');
         $controller = new StringController();
         $reflector = new ReflectionClass($controller);
 
@@ -57,12 +34,12 @@ class StringControllerTest extends KernelTestCase
         $reflector->getProperty('isInsensitive')->setValue($controller, $isInsensitive);
 
         $method = $reflector->getMethod('stringReplace');
-        $method->invokeArgs($controller, [$this->productListing]);
+        $method->invokeArgs($controller, [$this->objectListing]);
 
         for ($i = 0; $i < $productNumber - 1; ++$i) {
-            $this->assertEquals($expected, $this->productListing[$i]->get());
+            $this->assertEquals($expected, $this->objectListing[$i]->get());
         }
-        $this->assertEquals('different name', $this->productListing[$productNumber]->get());
+        $this->assertEquals('different name', $this->objectListing[$productNumber]->get());
     }
 
     public function dataProvider(): array
