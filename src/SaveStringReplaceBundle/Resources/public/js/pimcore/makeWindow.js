@@ -1,4 +1,9 @@
-function makeWindow(title, url, data, className, idList = []) {
+function makeWindow(title, url, data, className, value, idList = []) {
+    const store = Ext.create('Ext.data.Store', {
+        fields: ['optionName', 'value'],
+        data: data
+    })
+
     const replacePanel = new Ext.form.Panel({
         layout: 'anchor',
         url: url,
@@ -9,13 +14,11 @@ function makeWindow(title, url, data, className, idList = []) {
             xtype: 'combo',
             name: 'field',
             fieldLabel: 'Select Field:',
-            store: Ext.create('Ext.data.Store', {
-                fields: ['optionName', 'value'],
-                data: data
-            }),
+            store: store,
             emptyText: 'Select one...',
             displayField: 'optionName',
             valueField: 'value',
+            value: store.findRecord('value', value),
             allowBlank: false,
             margin: '10'
         }, {
