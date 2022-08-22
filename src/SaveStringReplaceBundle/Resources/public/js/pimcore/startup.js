@@ -31,13 +31,14 @@ const rowContextMenuHandler = async (e) => {
 }
 
 const headerMenuHandler = async (e) => {
-    console.log(e)
     const menu = e.detail.menu
     const selectedRows = e.detail.selectedRows
 
     removeMenuItemsIfPresent(menu)
 
-    const className = '';
+    const classId = e.detail.classId
+    const classes = e.detail.classes
+    const className = classes.find(c => c.id === classId).name;
 
     const columns = e.detail.object.columns
     const columnsConfig = getColumnsConfig(columns)

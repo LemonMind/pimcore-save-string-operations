@@ -105,6 +105,8 @@ pimcore.element.helpers.gridColumnConfigExtended = {
                         object: grid,
                         selectedRows: grid.getSelectionModel().getSelection(),
                         menu: menu,
+                        classId: this.classId,
+                        classes: this.object.data.classes,
                     }
                 });
 
