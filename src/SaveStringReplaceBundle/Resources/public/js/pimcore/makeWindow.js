@@ -1,16 +1,16 @@
-function makeWindow(title, url, data, className, value, idList = []) {
+function makeWindow(title, url, data, className, value, showSelect, idList = []) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
     })
 
-    const replacePanel = new Ext.form.Panel({
+    let replacePanel = new Ext.form.Panel({
         layout: 'anchor',
         url: url,
         defaults: {
             anchor: '100%'
         },
-        items: [{
+        items: [showSelect ? {
             xtype: 'combo',
             name: 'field',
             fieldLabel: 'Select Field:',
@@ -21,6 +21,11 @@ function makeWindow(title, url, data, className, value, idList = []) {
             value: store.findRecord('value', value),
             allowBlank: false,
             margin: '10'
+        } : {
+            xtype: 'hiddenfield',
+            name: 'field',
+            value: store.findRecord('value', value),
+            allowBlank: false,
         }, {
             xtype: 'textfield',
             fieldLabel: 'Search',
@@ -96,8 +101,8 @@ function makeWindow(title, url, data, className, value, idList = []) {
         title: title,
         modal: true,
         layout: 'fit',
-        width: 500,
-        height: 300,
+        width: 420,
+        height: 260,
         items: replacePanel
     })
 

@@ -62,7 +62,7 @@ const headerMenuHandler = async (e) => {
         notEditableError = true
     }
 
-    addMenuItems(menu, selectedFieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError)
+    addMenuItems(menu, selectedFieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
 }
 
 
@@ -93,7 +93,7 @@ const getColumnsConfig = (columns) => {
     }, []);
 }
 
-const addMenuItems = (menu, selectedFieldsData, className, idList = [], activeHeader = '', notEditableError = false) => {
+const addMenuItems = (menu, selectedFieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
     menu.add({
         itemId: replaceSelectedKey,
         text: "String replace selected",
@@ -103,7 +103,7 @@ const addMenuItems = (menu, selectedFieldsData, className, idList = [], activeHe
                 Ext.MessageBox.alert(t('error'), t('this_element_cannot_be_edited'));
                 return
             }
-            makeWindow('Replace selected', '/admin/string_replace/selected', selectedFieldsData, className, activeHeader, idList)
+            makeWindow('Replace selected', '/admin/string_replace/selected', selectedFieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
@@ -116,7 +116,7 @@ const addMenuItems = (menu, selectedFieldsData, className, idList = [], activeHe
                 Ext.MessageBox.alert(t('error'), t('this_element_cannot_be_edited'));
                 return
             }
-            makeWindow('Replace all', '/admin/string_replace/all', selectedFieldsData, className, activeHeader)
+            makeWindow('Replace all', '/admin/string_replace/all', selectedFieldsData, className, activeHeader, showSelect)
         }
     });
 
