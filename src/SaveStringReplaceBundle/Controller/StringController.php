@@ -53,6 +53,10 @@ class StringController extends AdminController
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
+
+        if ('' === $className) {
+            $this->returnAction(false, 'Please select some fields first');
+        }
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $this->isInsensitive = null !== $request->get('insensitive');
 
