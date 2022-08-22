@@ -47,6 +47,9 @@ class StringController extends AdminController
         return $this->returnAction(true, '');
     }
 
+    /**
+     * @throws Exception
+     */
     private function getParams(Request $request, bool $test = false): void
     {
         $this->field = $request->get('field');
@@ -55,8 +58,9 @@ class StringController extends AdminController
         $className = $request->get('className');
 
         if ('' === $className) {
-            $this->returnAction(false, 'Please select some fields first');
+            throw new Exception('Class name is not defined');
         }
+
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $this->isInsensitive = null !== $request->get('insensitive');
 
