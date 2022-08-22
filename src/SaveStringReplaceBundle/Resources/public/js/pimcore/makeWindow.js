@@ -24,7 +24,7 @@ function makeWindow(title, url, data, className, value, showSelect, idList = [])
         } : {
             xtype: 'hiddenfield',
             name: 'field',
-            value: store.findRecord('value', value),
+            value: value,
             allowBlank: false,
         }, {
             xtype: 'textfield',
