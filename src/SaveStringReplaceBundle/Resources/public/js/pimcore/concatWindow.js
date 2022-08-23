@@ -1,4 +1,4 @@
-function concatWindow(title, url, data, className, value, idList = []) {
+function concatWindow(title, url, data, allData, className, value, idList = []) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
@@ -6,7 +6,7 @@ function concatWindow(title, url, data, className, value, idList = []) {
 
     const storeWithInput = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
-        data: [...data, { optionName: 'Input', value: 'input' }]
+        data: [...allData, { optionName: 'Input', value: 'input' }]
     })
 
     const handleInput = (id, e) => {

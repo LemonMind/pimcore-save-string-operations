@@ -17,8 +17,10 @@ const rowContextMenuHandler = async (e) => {
     const columns = e.detail.object.columns
     const columnsConfig = getColumnsConfig(columns)
     const fieldsData = getFieldsData(columnsConfig)
+    const allFieldsData = getFieldsData(columnsConfig, false)
 
-    addMenuItems(menu, fieldsData, className, selectedRows.map(e => e.id))
+    addMenuItemsReplace(menu, fieldsData, className, selectedRows.map(e => e.id))
+    addMenuItemsConcat(menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
 
 }
 
@@ -35,12 +37,14 @@ const headerMenuHandler = async (e) => {
     const columns = e.detail.object.columns
     const columnsConfig = getColumnsConfig(columns)
     const fieldsData = getFieldsData(columnsConfig)
+    const allFieldsData = getFieldsData(columnsConfig, false)
 
     const activeHeader = menu.activeHeader.dataIndex
 
     const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
 
-    addMenuItems(menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
+    addMenuItemsReplace(menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
+    addMenuItemsConcat(menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
 }
 
 
@@ -69,9 +73,9 @@ const getColumnsConfig = (columns) => {
     }, []);
 }
 
-const getFieldsData = (columnsConfig) => {
+const getFieldsData = (columnsConfig, onlyEditable = true) => {
     return columnsConfig.reduce((arr, c) => {
-        if (allowedTypes.includes(c.type) && !c.noteditable) {
+        if (allowedTypes.includes(c.type) && (onlyEditable ? !c.noteditable : true)) {
             arr.push({
                 value: c.dataIndex,
                 optionName: c.text
@@ -90,7 +94,7 @@ const showEditableError = (notEditableError) => {
     return false
 }
 
-const addMenuItems = (menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
+const addMenuItemsReplace = (menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
     menu.add({
         itemId: keys.replaceSelected,
         text: "String replace selected",
@@ -111,13 +115,16 @@ const addMenuItems = (menu, fieldsData, className, idList = [], activeHeader = '
         }
     });
 
+    pimcore.layout.refresh();
+}
+
+const addMenuItemsConcat = (menu, fieldsData, className, idList = [], allFieldsData = [], activeHeader = '') => {
     menu.add({
         itemId: keys.concatSelected,
         text: "String concatenate selected",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
-            if (showEditableError(notEditableError)) return
-            concatWindow('Concatenate selected', '/admin/string_concat/selected', fieldsData, className, activeHeader, idList)
+            concatWindow('Concatenate selected', '/admin/string_concat/selected', fieldsData, allFieldsData, className, activeHeader, idList)
         }
     });
 
@@ -126,8 +133,7 @@ const addMenuItems = (menu, fieldsData, className, idList = [], activeHeader = '
         text: "String concatenate all",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
-            if (showEditableError(notEditableError)) return
-            concatWindow('Concatenate all', '/admin/string_concat/all', fieldsData, className, activeHeader)
+            concatWindow('Concatenate all', '/admin/string_concat/all', fieldsData, allFieldsData, className, activeHeader)
         }
     });
 
