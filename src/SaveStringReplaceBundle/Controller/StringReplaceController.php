@@ -66,8 +66,7 @@ class StringReplaceController extends AdminController
 
         $prefix = "\Pimcore\Model\DataObject";
         $suffix = '\Listing';
-        $arr = explode(' ', "\ $className");
-        $this->class = $prefix . $arr[0] . $arr[1] . $suffix;
+        $this->class = $prefix . "\\$className" . $suffix;
 
         if (!class_exists($this->class)) {
             if ($test) {

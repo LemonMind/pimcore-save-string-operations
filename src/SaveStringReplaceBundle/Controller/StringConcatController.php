@@ -102,7 +102,7 @@ class StringConcatController extends AdminController
                     $fields[] = $object->get($this->fields[0]);
                     $fields[] = $object->get($this->fields[1]);
                 }
-                $field = $fields[0] . $this->separator . $fields[1];
+                $field = strip_tags($fields[0]) . $this->separator . strip_tags($fields[1]);
                 $object->set($this->fieldToSaveConcat, $field);
                 $object->save();
             } catch (Exception $e) {
