@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/string_replace")
  */
-class StringController extends AdminController
+class StringReplaceController extends AdminController
 {
     private string $field;
     private string $search;
@@ -47,19 +47,26 @@ class StringController extends AdminController
         return $this->returnAction(true, '');
     }
 
+    /**
+     * @throws Exception
+     */
     private function getParams(Request $request, bool $test = false): void
     {
         $this->field = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
+
+        if ('' === $className) {
+            throw new Exception('Class name is not defined');
+        }
+
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $this->isInsensitive = null !== $request->get('insensitive');
 
         $prefix = "\Pimcore\Model\DataObject";
         $suffix = '\Listing';
-        $arr = explode(' ', "\ $className");
-        $this->class = $prefix . $arr[0] . $arr[1] . $suffix;
+        $this->class = $prefix . "\\$className" . $suffix;
 
         if (!class_exists($this->class)) {
             if ($test) {

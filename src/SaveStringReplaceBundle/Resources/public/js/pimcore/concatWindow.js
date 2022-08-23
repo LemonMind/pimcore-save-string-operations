@@ -1,50 +1,86 @@
-function makeWindow(title, url, data, className, value, showSelect, idList = []) {
+function concatWindow(title, url, data, allData, className, value, idList = []) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
     })
 
-    let replacePanel = new Ext.form.Panel({
+    const storeWithInput = Ext.create('Ext.data.Store', {
+        fields: ['optionName', 'value'],
+        data: [...allData, { optionName: 'Input', value: 'input' }]
+    })
+
+    const handleInput = (name, e) => {
+        const selectId = concatPanel.items.items.findIndex(item => item.id === e.id)
+        const inputField = concatPanel.items.items.find(item => item.name === name)
+
+        if (inputField) {
+            concatPanel.remove(inputField.id)
+        }
+
+        if (e.value === 'input') {
+            concatPanel.insert(selectId + 1, Ext.create("Ext.form.field.Text", {
+                xtype: 'textfield',
+                fieldLabel: 'Input',
+                name: name,
+                allowBlank: false,
+                margin: '10'
+            }));
+        }
+    }
+
+    let concatPanel = new Ext.form.Panel({
         layout: 'anchor',
         url: url,
         defaults: {
             anchor: '100%'
         },
-        items: [showSelect ? {
+        items: [{
             xtype: 'combo',
-            name: 'field',
+            name: 'field_one',
             fieldLabel: 'Select Field:',
+            store: storeWithInput,
+            emptyText: 'Select one...',
+            displayField: 'optionName',
+            valueField: 'value',
+            value: storeWithInput.findRecord('value', value),
+            allowBlank: false,
+            margin: '10',
+            listeners: {
+                'select': (e) => handleInput('input_one', e)
+            }
+        },
+
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Separator',
+            name: 'separator',
+            allowBlank: false,
+            margin: '10'
+        },
+        {
+            xtype: 'combo',
+            name: 'field_two',
+            fieldLabel: 'Select Field:',
+            store: storeWithInput,
+            emptyText: 'Select one...',
+            displayField: 'optionName',
+            valueField: 'value',
+            allowBlank: false,
+            margin: '10',
+            listeners: {
+                'select': (e) => handleInput('input_two', e)
+            }
+        },
+        {
+            xtype: 'combo',
+            name: 'field_save',
+            fieldLabel: 'Save to:',
             store: store,
             emptyText: 'Select one...',
             displayField: 'optionName',
             valueField: 'value',
             value: store.findRecord('value', value),
             allowBlank: false,
-            margin: '10'
-        } : {
-            xtype: 'hiddenfield',
-            name: 'field',
-            value: value,
-            allowBlank: false,
-        }, {
-            xtype: 'textfield',
-            fieldLabel: 'Search',
-            name: 'search',
-            allowBlank: false,
-            margin: '10'
-        },
-        {
-            xtype: 'textfield',
-            fieldLabel: 'Replace',
-            name: 'replace',
-            allowBlank: false,
-            margin: '10'
-        },
-        {
-            xtype: 'checkboxfield',
-            boxLabel: 'Insensitive',
-            name: 'insensitive',
-            inputValue: '1',
             margin: '10'
         },
         {
@@ -92,18 +128,20 @@ function makeWindow(title, url, data, className, value, showSelect, idList = [])
         }],
     })
 
+
+
     const waitMask = new Ext.LoadMask({
         msg: 'Please wait...',
-        target: replacePanel
+        target: concatPanel
     });
 
     let modal = new Ext.Window({
         title: title,
         modal: true,
         layout: 'fit',
-        width: 420,
-        height: 260,
-        items: replacePanel
+        width: 600,
+        height: 370,
+        items: concatPanel
     })
 
     modal.show();
