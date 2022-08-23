@@ -23,9 +23,9 @@ class StringReplaceControllerTest extends KernelTestCase
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {
         for ($i = 0; $i < $productNumber; ++$i) {
-            $this->objectListing[] = new TestObject($name);
+            $this->objectListing[] = new TestObject($name, '');
         }
-        $this->objectListing[] = new TestObject('different name');
+        $this->objectListing[] = new TestObject('different name', '');
         $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
 
@@ -38,9 +38,9 @@ class StringReplaceControllerTest extends KernelTestCase
         $method->invokeArgs($controller, [$this->objectListing]);
 
         for ($i = 0; $i < $productNumber - 1; ++$i) {
-            $this->assertEquals($expected, $this->objectListing[$i]->get());
+            $this->assertEquals($expected, $this->objectListing[$i]->get('name'));
         }
-        $this->assertEquals('different name', $this->objectListing[$productNumber]->get());
+        $this->assertEquals('different name', $this->objectListing[$productNumber]->get('name'));
     }
 
     public function dataProvider(): array

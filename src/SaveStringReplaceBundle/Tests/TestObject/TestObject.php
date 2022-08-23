@@ -7,20 +7,30 @@ namespace Lemonmind\SaveStringReplaceBundle\Tests\TestObject;
 class TestObject
 {
     private string $name;
+    private string $description;
 
-    public function __construct(string $name)
+    public function __construct(string $name, string $description)
     {
         $this->name = $name;
+        $this->description = $description;
     }
 
-    public function get(): string
+    public function get(string $field): string
     {
-        return $this->name;
+        if ('name' === $field) {
+            return $this->name;
+        }
+
+        return $this->description;
     }
 
-    public function set(string $field, string $name): void
+    public function set(string $field, string $text): void
     {
-        $this->name = $name;
+        if ('name' === $field) {
+            $this->name = $text;
+        } else {
+            $this->description = $text;
+        }
     }
 
     public function save(): void
