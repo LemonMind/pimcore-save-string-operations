@@ -6,7 +6,6 @@ namespace Lemonmind\SaveStringReplaceBundle\Controller;
 
 use Exception;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
-use Pimcore\Model\DataObject\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,9 +41,7 @@ class StringConcatController extends AdminController
     public function allAction(Request $request): Response
     {
         $this->getParams($request);
-        // $objectListing = new $this->class();
-        $objectListing = new Event\Listing();
-
+        $objectListing = new $this->class();
         $this->stringConcat($objectListing);
 
         return $this->returnAction(true, '');
@@ -55,17 +52,21 @@ class StringConcatController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->fields = ['title', ''];
-        $this->separator = ' ';
-        $this->fieldToSaveConcat = 'title';
-        $this->userInput = 'cos';
+        $this->fields[] = $request->get('field_one');
+        $this->fields[] = $request->get('field_two');
+        $this->fieldToSaveConcat = $request->get('field_save');
+        $this->userInput = '';
 
-        // $this->fields = $request->get('fields');
-        // $this->userInput = $request->get('userInput');
-        // $this->isUserInputFirst = $request->get('isUserInputFirst');
-        // $this->fieldToSaveConcat = $request->get('fieldToSaveConcat');
-        // $this->separator = $request->get('separator');
-        // $this->ids = array_filter(explode(',', trim($request->get('idList'))));
+        if ('input' === $this->fields[0]) {
+            $this->userInput = $request->get('input_one');
+        }
+
+        if ('input' === $this->fields[1]) {
+            $this->userInput = $request->get('input_two');
+        }
+
+        $this->separator = $request->get('separator');
+        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $className = $request->get('className');
 
         if ('' === $className) {
@@ -90,7 +91,7 @@ class StringConcatController extends AdminController
         foreach ($objectListing as $object) {
             try {
                 if ('' !== $this->userInput) {
-                    if ('' === $this->fields[0]) {
+                    if ('input' === $this->fields[0]) {
                         $fields[] = $this->userInput;
                         $fields[] = $object->get($this->fields[1]);
                     } else {
