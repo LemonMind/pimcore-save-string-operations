@@ -1,6 +1,7 @@
-# Replace strings permanently using Grid Options
+# Replace or concat strings permanently using Grid Options
 
-It's Pimcore Bundle to replace strings permanently using Grid Options. It will save replaced strings directly in object
+It's Pimcore Bundle to replace or concat strings permanently using Grid Options. It will save replaced strings directly
+in object
 
 ## Installation
 
@@ -12,6 +13,9 @@ bin/console pimcore:bundle:enable LemonmindSaveStringReplaceBundle
 After correct installation go to your object's folder and right click on one of the objects.
 Two buttons should appear
 ![](docs/replace_string_home.png)
+
+You can also access string replacement by clicking the column arrow in the grid as below
+![](docs/replace_string_column_home.png)
 
 ## Usage
 
