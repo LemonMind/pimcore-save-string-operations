@@ -1,5 +1,9 @@
-const replaceAllKey = 'srtingReplaceAll'
-const replaceSelectedKey = 'srtingReplaceSelected'
+const keys = {
+    replaceAll: 'srtingReplaceAll',
+    replaceSelected: 'srtingReplaceSelected',
+    concatAll: 'srtingConcatenateAll',
+    concatSelected: 'srtingConcatenateSelected'
+}
 const allowedTypes = ['input', 'textarea', 'wysiwyg']
 
 const rowContextMenuHandler = async (e) => {
@@ -9,24 +13,12 @@ const rowContextMenuHandler = async (e) => {
     removeMenuItemsIfPresent(menu)
 
     const className = selectedRows[0].data.classname
-    const keys = Object.keys(selectedRows[0].data.inheritedFields)
 
     const columns = e.detail.object.columns
     const columnsConfig = getColumnsConfig(columns)
+    const fieldsData = getFieldsData(columnsConfig)
 
-    const selectedFieldsData = keys.reduce((arr, key) => {
-        let config = columnsConfig.find(c => c.dataIndex === key && allowedTypes.includes(c.type) && !c.noteditable)
-        if (config) {
-            arr.push({
-                value: key,
-                optionName: config.text
-            })
-        }
-
-        return arr;
-    }, []);
-
-    addMenuItems(menu, selectedFieldsData, className, selectedRows.map(e => e.id))
+    addMenuItems(menu, fieldsData, className, selectedRows.map(e => e.id))
 
 }
 
@@ -42,40 +34,24 @@ const headerMenuHandler = async (e) => {
 
     const columns = e.detail.object.columns
     const columnsConfig = getColumnsConfig(columns)
+    const fieldsData = getFieldsData(columnsConfig)
 
     const activeHeader = menu.activeHeader.dataIndex
 
-    const field = columnsConfig.find(c => c.dataIndex === activeHeader && allowedTypes.includes(c.type))
-    let selectedFieldsData = []
-    let notEditableError = false
+    const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
 
-    if (!field) {
-        return
-    }
-
-    selectedFieldsData.push({
-        value: activeHeader,
-        optionName: field.text
-    })
-
-    if (field.noteditable) {
-        notEditableError = true
-    }
-
-    addMenuItems(menu, selectedFieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
+    addMenuItems(menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
 }
 
 
 const removeMenuItemsIfPresent = (menu) => {
     const menuKeys = menu.items.keys
 
-    if (menuKeys.includes(replaceAllKey)) {
-        menu.remove(replaceAllKey);
-    }
-
-    if (menuKeys.includes(replaceSelectedKey)) {
-        menu.remove(replaceSelectedKey);
-    }
+    Object.values(keys).forEach(item => {
+        if (menuKeys.includes(item)) {
+            menu.remove(item);
+        }
+    })
 }
 
 const getColumnsConfig = (columns) => {
@@ -93,30 +69,65 @@ const getColumnsConfig = (columns) => {
     }, []);
 }
 
-const addMenuItems = (menu, selectedFieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
+const getFieldsData = (columnsConfig) => {
+    return columnsConfig.reduce((arr, c) => {
+        if (allowedTypes.includes(c.type) && !c.noteditable) {
+            arr.push({
+                value: c.dataIndex,
+                optionName: c.text
+            })
+        }
+
+        return arr
+    }, [])
+}
+
+const showEditableError = (notEditableError) => {
+    if (notEditableError) {
+        Ext.MessageBox.alert(t('error'), t('this_element_cannot_be_edited'));
+        return true
+    }
+    return false
+}
+
+const addMenuItems = (menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
     menu.add({
-        itemId: replaceSelectedKey,
+        itemId: keys.replaceSelected,
         text: "String replace selected",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
-            if (notEditableError) {
-                Ext.MessageBox.alert(t('error'), t('this_element_cannot_be_edited'));
-                return
-            }
-            makeWindow('Replace selected', '/admin/string_replace/selected', selectedFieldsData, className, activeHeader, showSelect, idList)
+            if (showEditableError(notEditableError)) return
+            makeWindow('Replace selected', '/admin/string_replace/selected', fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
     menu.add({
-        itemId: replaceAllKey,
+        itemId: keys.replaceAll,
         text: "String replace all",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
-            if (notEditableError) {
-                Ext.MessageBox.alert(t('error'), t('this_element_cannot_be_edited'));
-                return
-            }
-            makeWindow('Replace all', '/admin/string_replace/all', selectedFieldsData, className, activeHeader, showSelect)
+            if (showEditableError(notEditableError)) return
+            makeWindow('Replace all', '/admin/string_replace/all', fieldsData, className, activeHeader, showSelect)
+        }
+    });
+
+    menu.add({
+        itemId: keys.concatSelected,
+        text: "String concatenate selected",
+        iconCls: "pimcore_icon_operator_concatenator",
+        handler: () => {
+            if (showEditableError(notEditableError)) return
+            concatWindow('Concatenate selected', '/admin/string_concat/selected', fieldsData, className, activeHeader, idList)
+        }
+    });
+
+    menu.add({
+        itemId: keys.concatAll,
+        text: "String concatenate all",
+        iconCls: "pimcore_icon_operator_concatenator",
+        handler: () => {
+            if (showEditableError(notEditableError)) return
+            concatWindow('Concatenate all', '/admin/string_concat/all', fieldsData, className, activeHeader)
         }
     });
 

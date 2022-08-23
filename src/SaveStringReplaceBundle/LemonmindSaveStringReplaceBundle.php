@@ -13,6 +13,7 @@ class LemonmindSaveStringReplaceBundle extends AbstractPimcoreBundle
         return [
             '/bundles/lemonmindsavestringreplace/js/pimcore/element/helpers/gridColumnConfigExtended.js',
             '/bundles/lemonmindsavestringreplace/js/pimcore/makeWindow.js',
+            '/bundles/lemonmindsavestringreplace/js/pimcore/concatWindow.js',
             '/bundles/lemonmindsavestringreplace/js/pimcore/startup.js',
         ];
     }
