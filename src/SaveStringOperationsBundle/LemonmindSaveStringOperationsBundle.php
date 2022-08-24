@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle;
+namespace Lemonmind\SaveStringOperationsBundle;
 
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
 
-class LemonmindSaveStringReplaceBundle extends AbstractPimcoreBundle
+class LemonmindSaveStringOperationsBundle extends AbstractPimcoreBundle
 {
     public function getJsPaths()
     {
