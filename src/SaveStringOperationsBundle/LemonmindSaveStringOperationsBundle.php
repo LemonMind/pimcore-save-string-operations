@@ -11,10 +11,10 @@ class LemonmindSaveStringOperationsBundle extends AbstractPimcoreBundle
     public function getJsPaths()
     {
         return [
-            '/bundles/lemonmindsavestringreplace/js/pimcore/element/helpers/gridColumnConfigExtended.js',
-            '/bundles/lemonmindsavestringreplace/js/pimcore/makeWindow.js',
-            '/bundles/lemonmindsavestringreplace/js/pimcore/concatWindow.js',
-            '/bundles/lemonmindsavestringreplace/js/pimcore/startup.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/element/helpers/gridColumnConfigExtended.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/makeWindow.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/concatWindow.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/startup.js',
         ];
     }
 }
