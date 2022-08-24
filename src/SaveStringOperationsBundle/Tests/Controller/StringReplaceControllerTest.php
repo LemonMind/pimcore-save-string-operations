@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle\Tests\Controller;
+namespace Lemonmind\SaveStringOperationsBundle\Tests\Controller;
 
-use Lemonmind\SaveStringReplaceBundle\Controller\StringReplaceController;
-use Lemonmind\SaveStringReplaceBundle\Tests\TestObject\TestObject;
+use Lemonmind\SaveStringOperationsBundle\Controller\StringReplaceController;
+use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
