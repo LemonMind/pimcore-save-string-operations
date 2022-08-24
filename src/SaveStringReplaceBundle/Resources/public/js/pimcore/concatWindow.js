@@ -54,7 +54,7 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
             xtype: 'textfield',
             fieldLabel: 'Separator',
             name: 'separator',
-            allowBlank: false,
+            allowBlank: true,
             margin: '10'
         },
         {
