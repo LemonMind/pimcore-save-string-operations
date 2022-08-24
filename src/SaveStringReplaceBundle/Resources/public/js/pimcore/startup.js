@@ -1,4 +1,5 @@
 const keys = {
+    stringSubMenu: 'stringSubMenu',
     replaceAll: 'srtingReplaceAll',
     replaceSelected: 'srtingReplaceSelected',
     concatAll: 'srtingConcatenateAll',
@@ -12,6 +13,7 @@ const rowContextMenuHandler = async (e) => {
     const gridStore = e.detail.object.store
 
     removeMenuItemsIfPresent(menu)
+    const subMenu = addSubMenu(menu)
 
     const className = selectedRows[0].data.classname
 
@@ -20,8 +22,8 @@ const rowContextMenuHandler = async (e) => {
     const fieldsData = getFieldsData(columnsConfig)
     const allFieldsData = getFieldsData(columnsConfig, false)
 
-    addMenuItemsReplace(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id))
-    addMenuItemsConcat(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
+    addMenuItemsReplace(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id))
+    addMenuItemsConcat(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
 
 }
 
@@ -31,6 +33,7 @@ const headerMenuHandler = async (e) => {
     const gridStore = e.detail.object.store
 
     removeMenuItemsIfPresent(menu)
+    const subMenu = addSubMenu(menu)
 
     const classId = e.detail.classId
     const classes = e.detail.classes
@@ -45,8 +48,8 @@ const headerMenuHandler = async (e) => {
 
     const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
 
-    addMenuItemsReplace(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
-    addMenuItemsConcat(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
+    addMenuItemsReplace(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
+    addMenuItemsConcat(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
 }
 
 
@@ -58,6 +61,19 @@ const removeMenuItemsIfPresent = (menu) => {
             menu.remove(item);
         }
     })
+}
+
+const addSubMenu = (menu) => {
+    const subMenu = menu.add({
+        itemId: keys.stringSubMenu,
+        text: 'String Operators',
+        iconCls: "pimcore_icon_folder",
+        menu: {
+            items: []
+        }
+    })
+
+    return subMenu.menu
 }
 
 const getColumnsConfig = (columns) => {
