@@ -38,8 +38,10 @@ class StringReplaceControllerTest extends KernelTestCase
         $method->invokeArgs($controller, [$this->objectListing]);
 
         for ($i = 0; $i < $productNumber - 1; ++$i) {
+            /* @phpstan-ignore-next-line */
             $this->assertEquals($expected, $this->objectListing[$i]->get('name'));
         }
+        /* @phpstan-ignore-next-line */
         $this->assertEquals('different name', $this->objectListing[$productNumber]->get('name'));
     }
 
@@ -72,6 +74,7 @@ class StringReplaceControllerTest extends KernelTestCase
         ?string $insensitive,
         bool $expectedIsInsensitive
     ): void {
+        /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
         $request->method('get')
             ->withConsecutive(['field'], ['search'], ['replace'], ['className'], ['idList'], ['insensitive'])
@@ -82,11 +85,15 @@ class StringReplaceControllerTest extends KernelTestCase
 
         $method = $reflector->getMethod('getParams');
         $method->invokeArgs($controller, [$request, true]);
-
+        /* @phpstan-ignore-next-line */
         $this->assertSame($field, $reflector->getProperty('field')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($search, $reflector->getProperty('search')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedClassName, $reflector->getProperty('class')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIds, $reflector->getProperty('ids')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIsInsensitive, $reflector->getProperty('isInsensitive')->getValue($controller));
     }
 

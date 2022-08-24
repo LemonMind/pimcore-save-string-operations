@@ -23,14 +23,13 @@ class StringConcatControllerTest extends KernelTestCase
     public function testStringConcat(
         string $name,
         string $description,
-        array  $fields,
+        array $fields,
         string $userInput,
         string $separator,
         string $fieldToSaveConcat,
         string $expected,
-        int    $productNumber
-    ): void
-    {
+        int $productNumber
+    ): void {
         for ($i = 0; $i < $productNumber; ++$i) {
             $this->objectListing[] = new TestObject($name, $description);
         }
@@ -46,6 +45,7 @@ class StringConcatControllerTest extends KernelTestCase
         $method->invokeArgs($controller, [$this->objectListing]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
+            /* @phpstan-ignore-next-line */
             $this->assertEquals($expected, $this->objectListing[$i]->get($fieldToSaveConcat));
         }
     }
@@ -77,16 +77,16 @@ class StringConcatControllerTest extends KernelTestCase
     public function testGetParams(
         string $fieldOne,
         string $fieldTwo,
-        array  $expectedFields,
+        array $expectedFields,
         string $fieldToSaveConcat,
         string $input,
         string $separator,
         string $idList,
-        array  $expectedIds,
+        array $expectedIds,
         string $className,
         string $expectedClassName
-    ): void
-    {
+    ): void {
+        /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
 
         if ('input' === $fieldOne) {
@@ -108,12 +108,17 @@ class StringConcatControllerTest extends KernelTestCase
         $method = $reflector->getMethod('getParams');
 
         $method->invokeArgs($controller, [$request, true]);
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedFields, $reflector->getProperty('fields')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($fieldToSaveConcat, $reflector->getProperty('fieldToSaveConcat')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedClassName, $reflector->getProperty('class')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIds, $reflector->getProperty('ids')->getValue($controller));
 
         if ('' !== $input) {
+            /* @phpstan-ignore-next-line */
             $this->assertSame($input, $reflector->getProperty('userInput')->getValue($controller));
         }
     }
