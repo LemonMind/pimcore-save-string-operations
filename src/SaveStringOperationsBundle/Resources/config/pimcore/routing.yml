@@ -1,5 +1,5 @@
 lemonmind_save_string_replace:
-    resource: "@LemonmindSaveStringReplaceBundle/Controller/"
+    resource: "@LemonmindSaveStringOperationsBundle/Controller/"
     type: annotation
     prefix: /
 

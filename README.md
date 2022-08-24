@@ -6,8 +6,8 @@ in object
 ## Installation
 
 ```
-composer require lemonmind/pimcore-save-string-replace
-bin/console pimcore:bundle:enable LemonmindSaveStringReplaceBundle
+composer require lemonmind/pimcore-save-string-operations
+bin/console pimcore:bundle:enable LemonmindSaveStringOperationsBundle
 ```
 
 After correct installation go to your object's folder and right click on one of the objects.
