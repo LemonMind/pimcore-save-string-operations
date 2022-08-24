@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Controller;
 
-use Lemonmind\SaveStringReplaceBundle\Controller\StringReplaceController;
-use Lemonmind\SaveStringReplaceBundle\Tests\TestObject\TestObject;
+use Lemonmind\SaveStringOperationsBundle\Controller\StringReplaceController;
+use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,9 +23,9 @@ class StringReplaceControllerTest extends KernelTestCase
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {
         for ($i = 0; $i < $productNumber; ++$i) {
-            $this->objectListing[] = new TestObject($name);
+            $this->objectListing[] = new TestObject($name, '');
         }
-        $this->objectListing[] = new TestObject('different name');
+        $this->objectListing[] = new TestObject('different name', '');
         $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
 
@@ -38,9 +38,11 @@ class StringReplaceControllerTest extends KernelTestCase
         $method->invokeArgs($controller, [$this->objectListing]);
 
         for ($i = 0; $i < $productNumber - 1; ++$i) {
-            $this->assertEquals($expected, $this->objectListing[$i]->get());
+            /* @phpstan-ignore-next-line */
+            $this->assertEquals($expected, $this->objectListing[$i]->get('name'));
         }
-        $this->assertEquals('different name', $this->objectListing[$productNumber]->get());
+        /* @phpstan-ignore-next-line */
+        $this->assertEquals('different name', $this->objectListing[$productNumber]->get('name'));
     }
 
     public function dataProvider(): array
@@ -62,17 +64,17 @@ class StringReplaceControllerTest extends KernelTestCase
      * @throws \ReflectionException
      */
     public function testGetParams(
-        string  $field,
-        string  $search,
-        string  $replace,
-        string  $className,
-        string  $expectedClassName,
-        string  $idList,
-        array   $expectedIds,
+        string $field,
+        string $search,
+        string $replace,
+        string $className,
+        string $expectedClassName,
+        string $idList,
+        array $expectedIds,
         ?string $insensitive,
-        bool    $expectedIsInsensitive
-    ): void
-    {
+        bool $expectedIsInsensitive
+    ): void {
+        /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
         $request->method('get')
             ->withConsecutive(['field'], ['search'], ['replace'], ['className'], ['idList'], ['insensitive'])
@@ -83,11 +85,15 @@ class StringReplaceControllerTest extends KernelTestCase
 
         $method = $reflector->getMethod('getParams');
         $method->invokeArgs($controller, [$request, true]);
-
+        /* @phpstan-ignore-next-line */
         $this->assertSame($field, $reflector->getProperty('field')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($search, $reflector->getProperty('search')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedClassName, $reflector->getProperty('class')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIds, $reflector->getProperty('ids')->getValue($controller));
+        /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIsInsensitive, $reflector->getProperty('isInsensitive')->getValue($controller));
     }
 
