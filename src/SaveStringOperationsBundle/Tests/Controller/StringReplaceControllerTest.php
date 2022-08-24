@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle\Tests\Controller;
+namespace Lemonmind\SaveStringOperationsBundle\Tests\Controller;
 
-use Lemonmind\SaveStringReplaceBundle\Controller\StringController;
+use Lemonmind\SaveStringReplaceBundle\Controller\StringReplaceController;
 use Lemonmind\SaveStringReplaceBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Request;
 
-class StringControllerTest extends KernelTestCase
+class StringReplaceControllerTest extends KernelTestCase
 {
     private array $objectListing;
 
@@ -26,7 +26,7 @@ class StringControllerTest extends KernelTestCase
             $this->objectListing[] = new TestObject($name);
         }
         $this->objectListing[] = new TestObject('different name');
-        $controller = new StringController();
+        $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
 
         $reflector->getProperty('field')->setValue($controller, 'name');
@@ -61,23 +61,24 @@ class StringControllerTest extends KernelTestCase
      *
      * @throws \ReflectionException
      */
-    public function testgetParams(
-        string $field,
-        string $search,
-        string $replace,
-        string $className,
-        string $expectedClassName,
-        string $idList,
-        array $expectedIds,
+    public function testGetParams(
+        string  $field,
+        string  $search,
+        string  $replace,
+        string  $className,
+        string  $expectedClassName,
+        string  $idList,
+        array   $expectedIds,
         ?string $insensitive,
-        bool $expectedIsInsensitive
-    ): void {
+        bool    $expectedIsInsensitive
+    ): void
+    {
         $request = $this->createStub(Request::class);
         $request->method('get')
             ->withConsecutive(['field'], ['search'], ['replace'], ['className'], ['idList'], ['insensitive'])
             ->willReturnOnConsecutiveCalls($field, $search, $replace, $className, $idList, $insensitive);
 
-        $controller = new StringController();
+        $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
 
         $method = $reflector->getMethod('getParams');

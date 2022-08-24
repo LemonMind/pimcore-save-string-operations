@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle\DependencyInjection;
+namespace Lemonmind\SaveStringOperationsBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

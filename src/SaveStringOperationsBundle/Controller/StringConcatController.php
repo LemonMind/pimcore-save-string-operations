@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle\Controller;
+namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
@@ -11,14 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/admin/string_replace")
+ * @Route("/admin/string_concat")
  */
-class StringController extends AdminController
+class StringConcatController extends AdminController
 {
-    private string $field;
-    private string $search;
-    private string $replace;
-    private bool $isInsensitive;
+    private array $fields;
+    private string $userInput;
+    private string $fieldToSaveConcat;
+    private string $separator;
     private string $class;
     private array $ids;
 
@@ -30,7 +30,7 @@ class StringController extends AdminController
         $this->getParams($request);
         $objectListing = new $this->class();
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $this->stringReplace($objectListing);
+        $this->stringConcat($objectListing);
 
         return $this->returnAction(true, '');
     }
@@ -42,7 +42,7 @@ class StringController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $this->stringReplace($objectListing);
+        $this->stringConcat($objectListing);
 
         return $this->returnAction(true, '');
     }
@@ -52,22 +52,31 @@ class StringController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field = $request->get('field');
-        $this->search = $request->get('search');
-        $this->replace = $request->get('replace');
+        $this->fields[] = $request->get('field_one');
+        $this->fields[] = $request->get('field_two');
+        $this->fieldToSaveConcat = $request->get('field_save');
+        $this->userInput = '';
+
+        if ('input' === $this->fields[0]) {
+            $this->userInput = $request->get('input_one');
+        }
+
+        if ('input' === $this->fields[1]) {
+            $this->userInput = $request->get('input_two');
+        }
+
+        $this->separator = $request->get('separator');
+        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $className = $request->get('className');
 
         if ('' === $className) {
             throw new Exception('Class name is not defined');
         }
 
-        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
-        $this->isInsensitive = null !== $request->get('insensitive');
-
         $prefix = "\Pimcore\Model\DataObject";
         $suffix = '\Listing';
-        $arr = explode(' ', "\ $className");
-        $this->class = $prefix . $arr[0] . $arr[1] . $suffix;
+
+        $this->class = $prefix . "\\$className" . $suffix;
 
         if (!class_exists($this->class)) {
             if ($test) {
@@ -77,24 +86,25 @@ class StringController extends AdminController
         }
     }
 
-    private function stringReplace($objectListing): void
+    private function stringConcat($objectListing): void
     {
         foreach ($objectListing as $object) {
             try {
-                $productField = $object->get($this->field);
-
-                if (null !== $productField) {
-                    if ($this->isInsensitive) {
-                        $productFieldReplaced = str_ireplace($this->search, $this->replace, $productField);
+                if ('' !== $this->userInput) {
+                    if ('input' === $this->fields[0]) {
+                        $fields[] = $this->userInput;
+                        $fields[] = $object->get($this->fields[1]);
                     } else {
-                        $productFieldReplaced = str_replace($this->search, $this->replace, $productField);
+                        $fields[] = $object->get($this->fields[0]);
+                        $fields[] = $this->userInput;
                     }
-
-                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        $object->set($this->field, $productFieldReplaced);
-                        $object->save();
-                    }
+                } else {
+                    $fields[] = $object->get($this->fields[0]);
+                    $fields[] = $object->get($this->fields[1]);
                 }
+                $field = strip_tags($fields[0]) . $this->separator . strip_tags($fields[1]);
+                $object->set($this->fieldToSaveConcat, $field);
+                $object->save();
             } catch (Exception $e) {
                 $this->returnAction(false, $e->getMessage());
             }

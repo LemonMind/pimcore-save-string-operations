@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemonmind\SaveStringReplaceBundle\Tests\TestObject;
+namespace Lemonmind\SaveStringOperationsBundle\Tests\TestObject;
 
 class TestObject
 {
