@@ -9,6 +9,7 @@ const allowedTypes = ['input', 'textarea', 'wysiwyg']
 const rowContextMenuHandler = async (e) => {
     const menu = e.detail.menu
     const selectedRows = e.detail.selectedRows
+    const gridStore = e.detail.object.store
 
     removeMenuItemsIfPresent(menu)
 
@@ -19,14 +20,15 @@ const rowContextMenuHandler = async (e) => {
     const fieldsData = getFieldsData(columnsConfig)
     const allFieldsData = getFieldsData(columnsConfig, false)
 
-    addMenuItemsReplace(menu, fieldsData, className, selectedRows.map(e => e.id))
-    addMenuItemsConcat(menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
+    addMenuItemsReplace(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id))
+    addMenuItemsConcat(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
 
 }
 
 const headerMenuHandler = async (e) => {
     const menu = e.detail.menu
     const selectedRows = e.detail.selectedRows
+    const gridStore = e.detail.object.store
 
     removeMenuItemsIfPresent(menu)
 
@@ -43,8 +45,8 @@ const headerMenuHandler = async (e) => {
 
     const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
 
-    addMenuItemsReplace(menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
-    addMenuItemsConcat(menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
+    addMenuItemsReplace(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
+    addMenuItemsConcat(gridStore, menu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
 }
 
 
@@ -94,14 +96,14 @@ const showEditableError = (notEditableError) => {
     return false
 }
 
-const addMenuItemsReplace = (menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
+const addMenuItemsReplace = (gridStore, menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
     menu.add({
         itemId: keys.replaceSelected,
         text: "String replace selected",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
-            makeWindow('Replace selected', '/admin/string_replace/selected', fieldsData, className, activeHeader, showSelect, idList)
+            makeWindow('Replace selected', '/admin/string_replace/selected', gridStore, fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
@@ -111,20 +113,20 @@ const addMenuItemsReplace = (menu, fieldsData, className, idList = [], activeHea
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
-            makeWindow('Replace all', '/admin/string_replace/all', fieldsData, className, activeHeader, showSelect)
+            makeWindow('Replace all', '/admin/string_replace/all', gridStore, fieldsData, className, activeHeader, showSelect)
         }
     });
 
     pimcore.layout.refresh();
 }
 
-const addMenuItemsConcat = (menu, fieldsData, className, idList = [], allFieldsData = [], activeHeader = '') => {
+const addMenuItemsConcat = (gridStore, menu, fieldsData, className, idList = [], allFieldsData = [], activeHeader = '') => {
     menu.add({
         itemId: keys.concatSelected,
         text: "String concatenate selected",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
-            concatWindow('Concatenate selected', '/admin/string_concat/selected', fieldsData, allFieldsData, className, activeHeader, idList)
+            concatWindow('Concatenate selected', '/admin/string_concat/selected', gridStore, fieldsData, allFieldsData, className, activeHeader, idList)
         }
     });
 
@@ -133,7 +135,7 @@ const addMenuItemsConcat = (menu, fieldsData, className, idList = [], allFieldsD
         text: "String concatenate all",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
-            concatWindow('Concatenate all', '/admin/string_concat/all', fieldsData, allFieldsData, className, activeHeader)
+            concatWindow('Concatenate all', '/admin/string_concat/all', gridStore, fieldsData, allFieldsData, className, activeHeader)
         }
     });
 

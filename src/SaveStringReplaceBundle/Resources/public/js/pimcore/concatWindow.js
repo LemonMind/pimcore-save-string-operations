@@ -1,4 +1,4 @@
-function concatWindow(title, url, data, allData, className, value, idList = []) {
+function concatWindow(title, url, gridStore, data, allData, className, value, idList = []) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
@@ -115,8 +115,7 @@ function concatWindow(title, url, data, allData, className, value, idList = []) 
                     success: function (form, action) {
                         waitMask.hide();
                         modal.hide();
-                        mockEvent = { stopEvent: function () { } };
-                        pimcore.helpers.handleF5(116, mockEvent);
+                        gridStore.loadPage(gridStore.currentPage)
                         pimcore.helpers.showNotification(t("success"), t("Changes Saved"), "success");
                     },
                     failure: function (form, action) {

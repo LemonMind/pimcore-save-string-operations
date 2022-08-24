@@ -1,4 +1,4 @@
-function makeWindow(title, url, data, className, value, showSelect, idList = []) {
+function makeWindow(title, url, gridStore, data, className, value, showSelect, idList = []) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
@@ -79,8 +79,7 @@ function makeWindow(title, url, data, className, value, showSelect, idList = [])
                     success: function (form, action) {
                         waitMask.hide();
                         modal.hide();
-                        mockEvent = { stopEvent: function () { } };
-                        pimcore.helpers.handleF5(116, mockEvent);
+                        gridStore.loadPage(gridStore.currentPage)
                         pimcore.helpers.showNotification(t("success"), t("Changes Saved"), "success");
                     },
                     failure: function (form, action) {
