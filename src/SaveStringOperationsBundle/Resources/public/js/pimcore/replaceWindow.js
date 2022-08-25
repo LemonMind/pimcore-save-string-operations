@@ -1,4 +1,4 @@
-function makeWindow(title, url, gridStore, data, className, value, showSelect, idList) {
+function replaceWindow(title, url, gridStore, data, className, value, showSelect, idList) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data

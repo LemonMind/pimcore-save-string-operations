@@ -200,7 +200,7 @@ const addMenuItemsString = (config) => {
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
-            makeWindow('Replace selected', '/admin/string_replace/selected', gridStore, fieldsData, className, activeHeader, showSelect, idList)
+            replaceWindow('Replace selected', '/admin/string_replace/selected', gridStore, fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
@@ -210,7 +210,7 @@ const addMenuItemsString = (config) => {
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
-            makeWindow('Replace all', '/admin/string_replace/all', gridStore, fieldsData, className, activeHeader, showSelect, idList)
+            replaceWindow('Replace all', '/admin/string_replace/all', gridStore, fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
