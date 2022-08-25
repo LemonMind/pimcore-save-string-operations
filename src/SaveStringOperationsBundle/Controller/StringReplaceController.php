@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,9 +32,16 @@ class StringReplaceController extends AdminController
         $this->getParams($request);
         $objectListing = new $this->class();
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $this->stringReplace($objectListing);
+        $success = StringReplaceService::stringReplace(
+            $objectListing,
+            $this->field,
+            $this->search,
+            $this->replace,
+            $this->isInsensitive,
+            $this->isObjectBrick
+        );
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -43,9 +51,16 @@ class StringReplaceController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $this->stringReplace($objectListing);
+        $success = StringReplaceService::stringReplace(
+            $objectListing,
+            $this->field,
+            $this->search,
+            $this->replace,
+            $this->isInsensitive,
+            $this->isObjectBrick
+        );
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -79,56 +94,6 @@ class StringReplaceController extends AdminController
                 return;
             }
             $this->returnAction(false, 'Class does not exist');
-        }
-    }
-
-    private function stringReplace($objectListing): void
-    {
-        foreach ($objectListing as $object) {
-            try {
-                $objectClassToArray = [];
-                $objectBrickKey = ' ';
-
-                if ($this->isObjectBrick) {
-                    $objectClassToArray[] = (array) $object->get('o_class');
-
-                    foreach ($objectClassToArray[0]['fieldDefinitions'] as $key => $value) {
-                        $valueToArray = (array) $value;
-
-                        if ('objectbricks' === $valueToArray['fieldtype']) {
-                            if (in_array($this->field[0], $valueToArray['allowedTypes'], true)) {
-                                $objectBrickKey = $key;
-                            }
-                        }
-                    }
-
-                    if (null === $object->get($objectBrickKey)->get($this->field[0])) {
-                        continue;
-                    }
-                    $productField = $object->get($objectBrickKey)->get($this->field[0])->get($this->field[1]);
-                } else {
-                    $productField = $object->get($this->field[0]);
-                }
-
-                if (null !== $productField) {
-                    if ($this->isInsensitive) {
-                        $productFieldReplaced = str_ireplace($this->search, $this->replace, $productField);
-                    } else {
-                        $productFieldReplaced = str_replace($this->search, $this->replace, $productField);
-                    }
-
-                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        if ($this->isObjectBrick) {
-                            $object->get($objectBrickKey)->get($this->field[0])->set($this->field[1], $productFieldReplaced);
-                        } else {
-                            $object->set($this->field[0], $productFieldReplaced);
-                        }
-                        $object->save();
-                    }
-                }
-            } catch (Exception $e) {
-                $this->returnAction(false, $e->getMessage());
-            }
         }
     }
 
