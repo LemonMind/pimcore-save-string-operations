@@ -1,27 +1,43 @@
-function concatWindow(title, url, gridStore, data, allData, className, value, idList) {
+function numericWindow(title, url, gridStore, data, className, value, showSelect, idList) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
     })
 
-    const storeWithInput = Ext.create('Ext.data.Store', {
+    const storeOptions = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
-        data: [...allData, { optionName: 'Input', value: 'input' }]
+        data: [
+            { 'optionName': 'Value', 'value': 'value' },
+            { 'optionName': 'Percentage', 'value': 'percentage' }
+        ]
     })
 
-    const handleInput = (name, e) => {
+    const handleInput = (e) => {
+        const names = ['set_to_value', 'set_to_percentage']
         const selectId = panel.items.items.findIndex(item => item.id === e.id)
-        const inputField = panel.items.items.find(item => item.name === name)
 
-        if (inputField) {
-            panel.remove(inputField.id)
+        const fields = panel.items.items.filter(item => names.some(name => name === item.name))
+
+        fields.forEach(field => {
+            panel.remove(field.id)
+        });
+
+        if (e.value === 'value') {
+            panel.insert(selectId + 1, Ext.create("Ext.form.field.Number", {
+                xtype: 'numberfield',
+                name: 'set_to_value',
+                fieldLabel: 'Value',
+                allowBlank: false,
+                margin: '10'
+            }));
         }
 
-        if (e.value === 'input') {
-            panel.insert(selectId + 1, Ext.create("Ext.form.field.Text", {
-                xtype: 'textfield',
-                fieldLabel: 'Input',
-                name: name,
+        if (e.value === 'percentage') {
+            panel.insert(selectId + 1, Ext.create("Ext.form.field.Number", {
+                xtype: 'numberfield',
+                name: 'set_to_percentage',
+                fieldLabel: 'Percentage',
+                minValue: 0,
                 allowBlank: false,
                 margin: '10'
             }));
@@ -34,47 +50,10 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
         defaults: {
             anchor: '100%'
         },
-        items: [{
+        items: [showSelect ? {
             xtype: 'combo',
-            name: 'field_one',
+            name: 'field',
             fieldLabel: 'Select Field:',
-            store: storeWithInput,
-            emptyText: 'Select one...',
-            displayField: 'optionName',
-            valueField: 'value',
-            value: storeWithInput.findRecord('value', value),
-            allowBlank: false,
-            margin: '10',
-            listeners: {
-                'select': (e) => handleInput('input_one', e)
-            }
-        },
-
-        {
-            xtype: 'textfield',
-            fieldLabel: 'Separator',
-            name: 'separator',
-            allowBlank: true,
-            margin: '10'
-        },
-        {
-            xtype: 'combo',
-            name: 'field_two',
-            fieldLabel: 'Select Field:',
-            store: storeWithInput,
-            emptyText: 'Select one...',
-            displayField: 'optionName',
-            valueField: 'value',
-            allowBlank: false,
-            margin: '10',
-            listeners: {
-                'select': (e) => handleInput('input_two', e)
-            }
-        },
-        {
-            xtype: 'combo',
-            name: 'field_save',
-            fieldLabel: 'Save to:',
             store: store,
             emptyText: 'Select one...',
             displayField: 'optionName',
@@ -82,6 +61,25 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
             value: store.findRecord('value', value),
             allowBlank: false,
             margin: '10'
+        } : {
+            xtype: 'hiddenfield',
+            name: 'field',
+            value: value,
+            allowBlank: false,
+        },
+        {
+            xtype: 'combo',
+            name: 'field',
+            fieldLabel: 'Set to',
+            store: storeOptions,
+            emptyText: 'Select one...',
+            displayField: 'optionName',
+            valueField: 'value',
+            allowBlank: false,
+            margin: '10',
+            listeners: {
+                'select': handleInput
+            }
         },
         {
             xtype: 'hiddenfield',
@@ -109,8 +107,6 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
         }],
     })
 
-
-
     const waitMask = new Ext.LoadMask({
         msg: 'Please wait...',
         target: panel
@@ -120,8 +116,8 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
         title: title,
         modal: true,
         layout: 'fit',
-        width: 600,
-        height: 370,
+        width: 420,
+        height: 260,
         items: panel
     })
 

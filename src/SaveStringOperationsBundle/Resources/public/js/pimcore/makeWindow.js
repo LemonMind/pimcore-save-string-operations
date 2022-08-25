@@ -1,10 +1,10 @@
-function makeWindow(title, url, gridStore, data, className, value, showSelect, idList = []) {
+function makeWindow(title, url, gridStore, data, className, value, showSelect, idList) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
     })
 
-    let replacePanel = new Ext.form.Panel({
+    let panel = new Ext.form.Panel({
         layout: 'anchor',
         url: url,
         defaults: {
@@ -68,32 +68,14 @@ function makeWindow(title, url, gridStore, data, className, value, showSelect, i
             iconCls: 'x-btn-icon-el x-btn-icon-el-default-small pimcore_icon_apply',
             handler: function () {
                 let form = this.up('form').getForm();
-                if (!form.isValid()) {
-                    pimcore.helpers.showNotification(t("error"), t("Your form is invalid!"), "error");
-                    return
-                }
-
-                waitMask.show();
-
-                form.submit({
-                    success: function (form, action) {
-                        waitMask.hide();
-                        modal.hide();
-                        gridStore.loadPage(gridStore.currentPage)
-                        pimcore.helpers.showNotification(t("success"), t("Changes Saved"), "success");
-                    },
-                    failure: function (form, action) {
-                        waitMask.hide();
-                        pimcore.helpers.showNotification(t("error"), t("Error when saving"), "error");
-                    },
-                });
+                formHandler(form, waitMask, modal, gridStore)
             }
         }],
     })
 
     const waitMask = new Ext.LoadMask({
         msg: 'Please wait...',
-        target: replacePanel
+        target: panel
     });
 
     let modal = new Ext.Window({
@@ -102,7 +84,7 @@ function makeWindow(title, url, gridStore, data, className, value, showSelect, i
         layout: 'fit',
         width: 420,
         height: 260,
-        items: replacePanel
+        items: panel
     })
 
     modal.show();

@@ -3,53 +3,122 @@ const keys = {
     replaceAll: 'srtingReplaceAll',
     replaceSelected: 'srtingReplaceSelected',
     concatAll: 'srtingConcatenateAll',
-    concatSelected: 'srtingConcatenateSelected'
+    concatSelected: 'srtingConcatenateSelected',
+    numericSubMenu: 'numericSubMenu',
+    changeAll: 'numberChangeAll',
+    changeSelected: 'numberChangeSelected',
 }
-const allowedTypes = ['input', 'textarea', 'wysiwyg']
+
+const allowedStringTypes = ['input', 'textarea', 'wysiwyg']
+const allowedNumberTypes = ['numeric']
 
 const rowContextMenuHandler = async (e) => {
     const menu = e.detail.menu
+    removeMenuItemsIfPresent(menu)
     const selectedRows = e.detail.selectedRows
     const gridStore = e.detail.object.store
-
-    removeMenuItemsIfPresent(menu)
-    const subMenu = addSubMenu(menu)
 
     const className = selectedRows[0].data.classname
 
     const columns = e.detail.object.columns
-    const columnsConfig = getColumnsConfig(columns)
-    const fieldsData = getFieldsData(columnsConfig)
-    const allFieldsData = getFieldsData(columnsConfig, false)
+    const columnsConfig = getColumnsConfig(columns);
 
-    addMenuItemsReplace(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id))
-    addMenuItemsConcat(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData)
+    (() => {
+        const fieldsData = getFieldsData(columnsConfig, allowedStringTypes)
+        const allFieldsData = getFieldsData(columnsConfig, allowedStringTypes, false)
+
+        const subMenu = addSubMenu(menu, keys.stringSubMenu, 'String Operators')
+
+        addMenuItemsString({
+            gridStore,
+            menu: subMenu,
+            fieldsData,
+            className,
+            idList: selectedRows.map(e => e.id),
+            allFieldsData,
+        });
+    })();
+
+    (() => {
+        const fieldsData = getFieldsData(columnsConfig, allowedNumberTypes)
+        const allFieldsData = getFieldsData(columnsConfig, allowedNumberTypes, false)
+
+        const subMenu = addSubMenu(menu, keys.numericSubMenu, 'Numeric Operators')
+
+        addMenuItemsNumeric({
+            gridStore,
+            menu: subMenu,
+            fieldsData,
+            className,
+            idList: selectedRows.map(e => e.id),
+            allFieldsData,
+        });
+    })();
 
 }
 
 const headerMenuHandler = async (e) => {
     const menu = e.detail.menu
+    removeMenuItemsIfPresent(menu)
+    const activeHeader = menu.activeHeader.dataIndex
     const selectedRows = e.detail.selectedRows
     const gridStore = e.detail.object.store
-
-    removeMenuItemsIfPresent(menu)
-    const subMenu = addSubMenu(menu)
 
     const classId = e.detail.classId
     const classes = e.detail.classes
     const className = classes.find(c => c.id === classId).name;
 
-    const columns = e.detail.object.columns
-    const columnsConfig = getColumnsConfig(columns)
-    const fieldsData = getFieldsData(columnsConfig)
-    const allFieldsData = getFieldsData(columnsConfig, false)
+    const columns = e.detail.object.columns;
+    const columnsConfig = getColumnsConfig(columns);
 
-    const activeHeader = menu.activeHeader.dataIndex
+    (() => {
+        if (!columnsConfig.find(f => f.dataIndex === activeHeader && allowedStringTypes.includes(f.type))) {
+            return
+        }
 
-    const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
+        const fieldsData = getFieldsData(columnsConfig, allowedStringTypes)
+        const allFieldsData = getFieldsData(columnsConfig, allowedStringTypes, false)
 
-    addMenuItemsReplace(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), activeHeader, notEditableError, false)
-    addMenuItemsConcat(gridStore, subMenu, fieldsData, className, selectedRows.map(e => e.id), allFieldsData, activeHeader)
+        const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
+
+        const subMenu = addSubMenu(menu, keys.stringSubMenu, 'String Operators')
+
+        addMenuItemsString({
+            gridStore,
+            menu: subMenu,
+            fieldsData,
+            className,
+            idList: selectedRows.map(e => e.id),
+            activeHeader,
+            notEditableError,
+            showSelect: false,
+            allFieldsData,
+        });
+    })();
+
+    (() => {
+        if (!columnsConfig.find(f => f.dataIndex === activeHeader && allowedNumberTypes.includes(f.type))) {
+            return
+        }
+
+        const fieldsData = getFieldsData(columnsConfig, allowedNumberTypes)
+
+        const notEditableError = fieldsData.find(f => f.value === activeHeader) ? false : true
+
+        const subMenu = addSubMenu(menu, keys.numericSubMenu, 'Numeric Operators')
+
+        addMenuItemsNumeric({
+            gridStore,
+            menu: subMenu,
+            fieldsData,
+            className,
+            idList: selectedRows.map(e => e.id),
+            activeHeader,
+            notEditableError,
+            showSelect: false,
+        })
+    })();
+
 }
 
 
@@ -63,10 +132,10 @@ const removeMenuItemsIfPresent = (menu) => {
     })
 }
 
-const addSubMenu = (menu) => {
+const addSubMenu = (menu, key, text) => {
     const subMenu = menu.add({
-        itemId: keys.stringSubMenu,
-        text: 'String Operators',
+        itemId: key,
+        text: text,
         iconCls: "pimcore_icon_folder",
         menu: {
             items: []
@@ -91,7 +160,7 @@ const getColumnsConfig = (columns) => {
     }, []);
 }
 
-const getFieldsData = (columnsConfig, onlyEditable = true) => {
+const getFieldsData = (columnsConfig, allowedTypes, onlyEditable = true) => {
     return columnsConfig.reduce((arr, c) => {
         if (allowedTypes.includes(c.type) && (onlyEditable ? !c.noteditable : true)) {
             arr.push({
@@ -112,10 +181,22 @@ const showEditableError = (notEditableError) => {
     return false
 }
 
-const addMenuItemsReplace = (gridStore, menu, fieldsData, className, idList = [], activeHeader = '', notEditableError = false, showSelect = true) => {
+const addMenuItemsString = (config) => {
+    const {
+        gridStore,
+        menu,
+        fieldsData,
+        className,
+        idList = [],
+        activeHeader = '',
+        notEditableError = false,
+        showSelect = true,
+        allFieldsData = [],
+    } = config
+
     menu.add({
         itemId: keys.replaceSelected,
-        text: "String replace selected",
+        text: "Replace selected",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
@@ -125,21 +206,17 @@ const addMenuItemsReplace = (gridStore, menu, fieldsData, className, idList = []
 
     menu.add({
         itemId: keys.replaceAll,
-        text: "String replace all",
+        text: "Replace all",
         iconCls: "pimcore_icon_operator_stringreplace",
         handler: () => {
             if (showEditableError(notEditableError)) return
-            makeWindow('Replace all', '/admin/string_replace/all', gridStore, fieldsData, className, activeHeader, showSelect)
+            makeWindow('Replace all', '/admin/string_replace/all', gridStore, fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 
-    pimcore.layout.refresh();
-}
-
-const addMenuItemsConcat = (gridStore, menu, fieldsData, className, idList = [], allFieldsData = [], activeHeader = '') => {
     menu.add({
         itemId: keys.concatSelected,
-        text: "String concatenate selected",
+        text: "Concatenate selected",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
             concatWindow('Concatenate selected', '/admin/string_concat/selected', gridStore, fieldsData, allFieldsData, className, activeHeader, idList)
@@ -148,10 +225,45 @@ const addMenuItemsConcat = (gridStore, menu, fieldsData, className, idList = [],
 
     menu.add({
         itemId: keys.concatAll,
-        text: "String concatenate all",
+        text: "Concatenate all",
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
-            concatWindow('Concatenate all', '/admin/string_concat/all', gridStore, fieldsData, allFieldsData, className, activeHeader)
+            concatWindow('Concatenate all', '/admin/string_concat/all', gridStore, fieldsData, allFieldsData, className, activeHeader, idList)
+        }
+    });
+
+    pimcore.layout.refresh();
+}
+
+const addMenuItemsNumeric = (config) => {
+    const {
+        gridStore,
+        menu,
+        fieldsData,
+        className,
+        idList = [],
+        activeHeader = '',
+        notEditableError = false,
+        showSelect = true,
+    } = config
+
+    menu.add({
+        itemId: keys.changeSelected,
+        text: "Change selected",
+        iconCls: "pimcore_icon_data_group_numeric",
+        handler: () => {
+            if (showEditableError(notEditableError)) return
+            numericWindow('Change selected', '/admin/number_change/selected', gridStore, fieldsData, className, activeHeader, showSelect, idList)
+        }
+    });
+
+    menu.add({
+        itemId: keys.changeAll,
+        text: "Change all",
+        iconCls: "pimcore_icon_data_group_numeric",
+        handler: () => {
+            if (showEditableError(notEditableError)) return
+            numericWindow('Change all', '/admin/number_change/all', gridStore, fieldsData, className, activeHeader, showSelect, idList)
         }
     });
 

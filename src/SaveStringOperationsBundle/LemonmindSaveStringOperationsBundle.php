@@ -12,8 +12,10 @@ class LemonmindSaveStringOperationsBundle extends AbstractPimcoreBundle
     {
         return [
             '/bundles/lemonmindsavestringoperations/js/pimcore/element/helpers/gridColumnConfigExtended.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/formHandler.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/makeWindow.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/concatWindow.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/numericWindow.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/startup.js',
         ];
     }
