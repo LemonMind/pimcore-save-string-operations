@@ -101,6 +101,10 @@ class StringReplaceController extends AdminController
                             }
                         }
                     }
+
+                    if (null === $object->get($objectBrickKey)->get($this->field[0])) {
+                        continue;
+                    }
                     $productField = $object->get($objectBrickKey)->get($this->field[0])->get($this->field[1]);
                 } else {
                     $productField = $object->get($this->field[0]);
@@ -115,7 +119,7 @@ class StringReplaceController extends AdminController
 
                     if (0 != strcasecmp($productFieldReplaced, $productField)) {
                         if ($this->isObjectBrick) {
-                            $object->get($objectBrickKey)->get($this->field[0])->set($this->field[1], $this->replace);
+                            $object->get($objectBrickKey)->get($this->field[0])->set($this->field[1], $productFieldReplaced);
                         } else {
                             $object->set($this->field[0], $productFieldReplaced);
                         }
