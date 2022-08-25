@@ -15,10 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class StringReplaceController extends AdminController
 {
-    private string $field;
+    private array $field;
     private string $search;
     private string $replace;
     private bool $isInsensitive;
+    private bool $isObjectBrick = false;
     private string $class;
     private array $ids;
 
@@ -52,10 +53,15 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field = $request->get('field');
+        $this->field[] = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
+
+        if (str_contains($this->field[0], '~')) {
+            $this->field = explode('~', $this->field[0]);
+            $this->isObjectBrick = true;
+        }
 
         if ('' === $className) {
             throw new Exception('Class name is not defined');
@@ -80,7 +86,25 @@ class StringReplaceController extends AdminController
     {
         foreach ($objectListing as $object) {
             try {
-                $productField = $object->get($this->field);
+                $objectClassToArray = [];
+                $objectBrickKey = ' ';
+
+                if ($this->isObjectBrick) {
+                    $objectClassToArray[] = (array) $object->get('o_class');
+
+                    foreach ($objectClassToArray[0]['fieldDefinitions'] as $key => $value) {
+                        $valueToArray = (array) $value;
+
+                        if ('objectbricks' === $valueToArray['fieldtype']) {
+                            if (in_array($this->field[0], $valueToArray['allowedTypes'], true)) {
+                                $objectBrickKey = $key;
+                            }
+                        }
+                    }
+                    $productField = $object->get($objectBrickKey)->get($this->field[0])->get($this->field[1]);
+                } else {
+                    $productField = $object->get($this->field[0]);
+                }
 
                 if (null !== $productField) {
                     if ($this->isInsensitive) {
@@ -90,7 +114,11 @@ class StringReplaceController extends AdminController
                     }
 
                     if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        $object->set($this->field, $productFieldReplaced);
+                        if ($this->isObjectBrick) {
+                            $object->get($objectBrickKey)->get($this->field[0])->set($this->field[1], $this->replace);
+                        } else {
+                            $object->set($this->field[0], $productFieldReplaced);
+                        }
                         $object->save();
                     }
                 }
