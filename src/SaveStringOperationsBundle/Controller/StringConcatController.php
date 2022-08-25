@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\StringConcatService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +18,10 @@ class StringConcatController extends AdminController
 {
     private array $fields;
     private string $userInput;
-    private string $fieldToSaveConcat;
+    private string|array $fieldToSaveConcat;
     private string $separator;
     private string $class;
+    private bool $isObjectBrick = false;
     private array $ids;
 
     /**
@@ -30,9 +32,15 @@ class StringConcatController extends AdminController
         $this->getParams($request);
         $objectListing = new $this->class();
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $this->stringConcat($objectListing);
+        $success = StringConcatService::stringConcat(
+            $objectListing,
+            $this->fields,
+            $this->userInput,
+            $this->fieldToSaveConcat,
+            $this->separator,
+            $this->isObjectBrick);
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -42,9 +50,15 @@ class StringConcatController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $this->stringConcat($objectListing);
+        $success = StringConcatService::stringConcat(
+            $objectListing,
+            $this->fields,
+            $this->userInput,
+            $this->fieldToSaveConcat,
+            $this->separator,
+            $this->isObjectBrick);
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -56,6 +70,21 @@ class StringConcatController extends AdminController
         $this->fields[] = $request->get('field_two');
         $this->fieldToSaveConcat = $request->get('field_save');
         $this->userInput = '';
+
+        if (str_contains($this->fields[0], '~')) {
+            $this->fields[0] = explode('~', $this->fields[0]);
+            $this->isObjectBrick = true;
+        }
+
+        if (str_contains($this->fields[1], '~')) {
+            $this->fields[1] = explode('~', $this->fields[1]);
+            $this->isObjectBrick = true;
+        }
+
+        if (str_contains($this->fieldToSaveConcat, '~')) {
+            $this->fieldToSaveConcat = explode('~', $this->fieldToSaveConcat);
+            $this->isObjectBrick = true;
+        }
 
         if ('input' === $this->fields[0]) {
             $this->userInput = $request->get('input_one');
@@ -83,31 +112,6 @@ class StringConcatController extends AdminController
                 return;
             }
             $this->returnAction(false, 'Class does not exist');
-        }
-    }
-
-    private function stringConcat($objectListing): void
-    {
-        foreach ($objectListing as $object) {
-            try {
-                if ('' !== $this->userInput) {
-                    if ('input' === $this->fields[0]) {
-                        $fields[] = $this->userInput;
-                        $fields[] = $object->get($this->fields[1]);
-                    } else {
-                        $fields[] = $object->get($this->fields[0]);
-                        $fields[] = $this->userInput;
-                    }
-                } else {
-                    $fields[] = $object->get($this->fields[0]);
-                    $fields[] = $object->get($this->fields[1]);
-                }
-                $field = strip_tags($fields[0]) . $this->separator . strip_tags($fields[1]);
-                $object->set($this->fieldToSaveConcat, $field);
-                $object->save();
-            } catch (Exception $e) {
-                $this->returnAction(false, $e->getMessage());
-            }
         }
     }
 

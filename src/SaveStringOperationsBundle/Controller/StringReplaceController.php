@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,10 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class StringReplaceController extends AdminController
 {
-    private string $field;
+    private array $field;
     private string $search;
     private string $replace;
     private bool $isInsensitive;
+    private bool $isObjectBrick = false;
     private string $class;
     private array $ids;
 
@@ -30,9 +32,16 @@ class StringReplaceController extends AdminController
         $this->getParams($request);
         $objectListing = new $this->class();
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $this->stringReplace($objectListing);
+        $success = StringReplaceService::stringReplace(
+            $objectListing,
+            $this->field,
+            $this->search,
+            $this->replace,
+            $this->isInsensitive,
+            $this->isObjectBrick
+        );
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -42,9 +51,16 @@ class StringReplaceController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $this->stringReplace($objectListing);
+        $success = StringReplaceService::stringReplace(
+            $objectListing,
+            $this->field,
+            $this->search,
+            $this->replace,
+            $this->isInsensitive,
+            $this->isObjectBrick
+        );
 
-        return $this->returnAction(true, '');
+        return $this->returnAction($success, '');
     }
 
     /**
@@ -52,10 +68,15 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field = $request->get('field');
+        $this->field[] = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
+
+        if (str_contains($this->field[0], '~')) {
+            $this->field = explode('~', $this->field[0]);
+            $this->isObjectBrick = true;
+        }
 
         if ('' === $className) {
             throw new Exception('Class name is not defined');
@@ -73,30 +94,6 @@ class StringReplaceController extends AdminController
                 return;
             }
             $this->returnAction(false, 'Class does not exist');
-        }
-    }
-
-    private function stringReplace($objectListing): void
-    {
-        foreach ($objectListing as $object) {
-            try {
-                $productField = $object->get($this->field);
-
-                if (null !== $productField) {
-                    if ($this->isInsensitive) {
-                        $productFieldReplaced = str_ireplace($this->search, $this->replace, $productField);
-                    } else {
-                        $productFieldReplaced = str_replace($this->search, $this->replace, $productField);
-                    }
-
-                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        $object->set($this->field, $productFieldReplaced);
-                        $object->save();
-                    }
-                }
-            } catch (Exception $e) {
-                $this->returnAction(false, $e->getMessage());
-            }
         }
     }
 
