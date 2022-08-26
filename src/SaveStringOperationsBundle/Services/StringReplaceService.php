@@ -12,14 +12,15 @@ class StringReplaceService
     {
         foreach ($objectListing as $object) {
             try {
+                $object::setGetInheritedValues(true);
                 $objectClassToArray = [];
                 $objectBrickKey = ' ';
 
                 if ($isObjectBrick) {
-                    $objectClassToArray[] = (array) $object->get('o_class');
+                    $objectClassToArray[] = (array)$object->get('o_class');
 
                     foreach ($objectClassToArray[0]['fieldDefinitions'] as $key => $value) {
-                        $valueToArray = (array) $value;
+                        $valueToArray = (array)$value;
 
                         if ('objectbricks' === $valueToArray['fieldtype']) {
                             if (in_array($field[0], $valueToArray['allowedTypes'], true)) {
