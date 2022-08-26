@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
-use Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService;
+use Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/admin/string_replace")
+ * @Route("/admin/number_change")
  */
-class StringReplaceController extends AdminController
+class NumberOperationsController extends AdminController
 {
     private array $field;
-    private string $search;
-    private string $replace;
-    private bool $isInsensitive;
+    private string $setTo;
+    private float $value;
+    private string $changeType = '';
     private bool $isObjectBrick = false;
     private string $class;
     private array $ids;
@@ -32,12 +32,12 @@ class StringReplaceController extends AdminController
         $this->getParams($request);
         $objectListing = new $this->class();
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
-        $success = StringReplaceService::stringReplace(
+        $success = NumberOperationsService::numberOperations(
             $objectListing,
             $this->field,
-            $this->search,
-            $this->replace,
-            $this->isInsensitive,
+            $this->setTo,
+            $this->value,
+            $this->changeType,
             $this->isObjectBrick
         );
 
@@ -51,12 +51,12 @@ class StringReplaceController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $success = StringReplaceService::stringReplace(
+        $success = NumberOperationsService::numberOperations(
             $objectListing,
             $this->field,
-            $this->search,
-            $this->replace,
-            $this->isInsensitive,
+            $this->setTo,
+            $this->value,
+            $this->changeType,
             $this->isObjectBrick
         );
 
@@ -69,22 +69,24 @@ class StringReplaceController extends AdminController
     private function getParams(Request $request, bool $test = false): void
     {
         $this->field[] = $request->get('field');
-        $this->search = $request->get('search');
-        $this->replace = $request->get('replace');
+        $this->setTo = $request->get('set_to');
+        $this->value = (float) $request->get('value');
         $className = $request->get('className');
+        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
 
         if (str_contains($this->field[0], '~')) {
             $this->field = explode('~', $this->field[0]);
             $this->isObjectBrick = true;
         }
 
+        if ('percentage' === $this->setTo) {
+            $this->changeType = $request->get('change_type');
+            $this->value = $this->value / 100;
+        }
+
         if ('' === $className) {
             throw new Exception('Class name is not defined');
         }
-
-        $this->ids = array_filter(explode(',', trim($request->get('idList'))));
-        $this->isInsensitive = null !== $request->get('insensitive');
-
         $prefix = "\Pimcore\Model\DataObject";
         $suffix = '\Listing';
         $this->class = $prefix . "\\$className" . $suffix;

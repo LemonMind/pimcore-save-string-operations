@@ -1,4 +1,4 @@
-function concatWindow(title, url, gridStore, data, allData, className, value, idList = []) {
+function concatWindow(title, url, gridStore, data, allData, className, value, idList) {
     const store = Ext.create('Ext.data.Store', {
         fields: ['optionName', 'value'],
         data: data
@@ -10,15 +10,15 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
     })
 
     const handleInput = (name, e) => {
-        const selectId = concatPanel.items.items.findIndex(item => item.id === e.id)
-        const inputField = concatPanel.items.items.find(item => item.name === name)
+        const selectId = panel.items.items.findIndex(item => item.id === e.id)
+        const inputField = panel.items.items.find(item => item.name === name)
 
         if (inputField) {
-            concatPanel.remove(inputField.id)
+            panel.remove(inputField.id)
         }
 
         if (e.value === 'input') {
-            concatPanel.insert(selectId + 1, Ext.create("Ext.form.field.Text", {
+            panel.insert(selectId + 1, Ext.create("Ext.form.field.Text", {
                 xtype: 'textfield',
                 fieldLabel: 'Input',
                 name: name,
@@ -28,7 +28,7 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
         }
     }
 
-    let concatPanel = new Ext.form.Panel({
+    let panel = new Ext.form.Panel({
         layout: 'anchor',
         url: url,
         defaults: {
@@ -104,25 +104,7 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
             iconCls: 'x-btn-icon-el x-btn-icon-el-default-small pimcore_icon_apply',
             handler: function () {
                 let form = this.up('form').getForm();
-                if (!form.isValid()) {
-                    pimcore.helpers.showNotification(t("error"), t("Your form is invalid!"), "error");
-                    return
-                }
-
-                waitMask.show();
-
-                form.submit({
-                    success: function (form, action) {
-                        waitMask.hide();
-                        modal.hide();
-                        gridStore.loadPage(gridStore.currentPage)
-                        pimcore.helpers.showNotification(t("success"), t("Changes Saved"), "success");
-                    },
-                    failure: function (form, action) {
-                        waitMask.hide();
-                        pimcore.helpers.showNotification(t("error"), t("Error when saving"), "error");
-                    },
-                });
+                formHandler(form, waitMask, modal, gridStore)
             }
         }],
     })
@@ -131,7 +113,7 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
 
     const waitMask = new Ext.LoadMask({
         msg: 'Please wait...',
-        target: concatPanel
+        target: panel
     });
 
     let modal = new Ext.Window({
@@ -140,7 +122,7 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
         layout: 'fit',
         width: 600,
         height: 370,
-        items: concatPanel
+        items: panel
     })
 
     modal.show();
