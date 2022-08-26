@@ -17,7 +17,7 @@ class StringConcatService
                 $objectBrickKey = [];
 
                 if ($isObjectBrick) {
-                    $objectBrickKey = self::objectBrickKey((array)$object->get('o_class'), $fields, $fieldToSaveConcat);
+                    $objectBrickKey = self::objectBrickKey((array) $object->get('o_class'), $fields, $fieldToSaveConcat);
 
                     if ('' !== $objectBrickKey[0]) {
                         if (null === $object->get($objectBrickKey[0])->get($fields[0][0])) {
@@ -79,7 +79,7 @@ class StringConcatService
         $objectBrickKey = [0 => '', 1 => '', 'save' => ''];
 
         foreach ($objectClassToArray['fieldDefinitions'] as $key => $value) {
-            $valueToArray = (array)$value;
+            $valueToArray = (array) $value;
 
             if ('objectbricks' === $valueToArray['fieldtype']) {
                 if (in_array($fields[0][0], $valueToArray['allowedTypes'], true)) {
