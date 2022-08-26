@@ -36,4 +36,8 @@ class TestObject
     public function save(): void
     {
     }
+
+    public static function setGetInheritedValues(bool $value): void
+    {
+    }
 }
