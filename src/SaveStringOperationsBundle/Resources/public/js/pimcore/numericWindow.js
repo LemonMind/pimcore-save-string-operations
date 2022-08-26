@@ -10,10 +10,19 @@ function numericWindow(title, url, gridStore, data, className, value, showSelect
             { 'optionName': 'Value', 'value': 'value' },
             { 'optionName': 'Percentage', 'value': 'percentage' }
         ]
+
+    })
+
+    const storePercentage = Ext.create('Ext.data.Store', {
+        fields: ['optionName', 'value'],
+        data: [
+            { 'optionName': 'Increase', 'value': 'increase' },
+            { 'optionName': 'Decrease', 'value': 'decrease' }
+        ]
     })
 
     const handleInput = (e) => {
-        const names = ['set_to_value', 'set_to_percentage']
+        const names = ['value', 'change_type']
         const selectId = panel.items.items.findIndex(item => item.id === e.id)
 
         const fields = panel.items.items.filter(item => names.some(name => name === item.name))
@@ -25,7 +34,7 @@ function numericWindow(title, url, gridStore, data, className, value, showSelect
         if (e.value === 'value') {
             panel.insert(selectId + 1, Ext.create("Ext.form.field.Number", {
                 xtype: 'numberfield',
-                name: 'set_to_value',
+                name: names[0],
                 fieldLabel: 'Value',
                 allowBlank: false,
                 margin: '10'
@@ -33,14 +42,36 @@ function numericWindow(title, url, gridStore, data, className, value, showSelect
         }
 
         if (e.value === 'percentage') {
-            panel.insert(selectId + 1, Ext.create("Ext.form.field.Number", {
-                xtype: 'numberfield',
-                name: 'set_to_percentage',
-                fieldLabel: 'Percentage',
-                minValue: 0,
+            panel.insert(selectId + 1, Ext.create("Ext.form.field.ComboBox", {
+                xtype: 'combo',
+                name: names[1],
+                fieldLabel: 'Select Type',
+                store: storePercentage,
+                emptyText: 'Select one...',
+                displayField: 'optionName',
+                valueField: 'value',
                 allowBlank: false,
-                margin: '10'
-            }));
+                margin: '10',
+                listeners: {
+                    'select': (selectEvent) => {
+                        const field = panel.items.items.find(item => item.name === names[0])
+
+                        if (field) {
+                            panel.remove(field.id)
+                        }
+
+                        panel.insert(selectId + 2, Ext.create("Ext.form.field.Number", {
+                            xtype: 'numberfield',
+                            name: names[0],
+                            fieldLabel: 'Percentage',
+                            minValue: 0,
+                            maxValue: selectEvent.value === 'decrease' ? 100 : null,
+                            allowBlank: false,
+                            margin: '10'
+                        }));
+                    }
+                }
+            }))
         }
     }
 
@@ -116,8 +147,8 @@ function numericWindow(title, url, gridStore, data, className, value, showSelect
         title: title,
         modal: true,
         layout: 'fit',
-        width: 420,
-        height: 260,
+        width: 500,
+        height: 300,
         items: panel
     })
 
