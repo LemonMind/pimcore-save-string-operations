@@ -69,7 +69,7 @@ function numericWindow(title, url, gridStore, data, className, value, showSelect
         },
         {
             xtype: 'combo',
-            name: 'field',
+            name: 'set_to',
             fieldLabel: 'Set to',
             store: storeOptions,
             emptyText: 'Select one...',
