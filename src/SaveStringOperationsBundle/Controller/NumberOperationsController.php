@@ -21,6 +21,7 @@ class NumberOperationsController extends AdminController
     private float $value;
     private string $changeType = '';
     private bool $isObjectBrick = false;
+    private bool $isClassificationStore = false;
     private string $class;
     private array $ids;
 
@@ -38,7 +39,8 @@ class NumberOperationsController extends AdminController
             $this->setTo,
             $this->value,
             $this->changeType,
-            $this->isObjectBrick
+            $this->isObjectBrick,
+            $this->isClassificationStore
         );
 
         return $this->returnAction($success, '');
@@ -57,7 +59,8 @@ class NumberOperationsController extends AdminController
             $this->setTo,
             $this->value,
             $this->changeType,
-            $this->isObjectBrick
+            $this->isObjectBrick,
+            $this->isClassificationStore
         );
 
         return $this->returnAction($success, '');
@@ -76,7 +79,12 @@ class NumberOperationsController extends AdminController
 
         if (str_contains($this->field[0], '~')) {
             $this->field = explode('~', $this->field[0]);
-            $this->isObjectBrick = true;
+
+            if ('classificationstore' === $this->field[1]) {
+                $this->isClassificationStore = true;
+            } else {
+                $this->isObjectBrick = true;
+            }
         }
 
         if ('percentage' === $this->setTo) {
