@@ -34,7 +34,7 @@ class StringConcatServiceTest extends KernelTestCase
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringConcatService');
         $method = $reflector->getMethod('stringConcat');
-        $method->invokeArgs(null, [$objectListing, $fields, $userInput, $fieldToSaveConcat, $separator, false]);
+        $method->invokeArgs(null, [$objectListing, $fields, $userInput, $fieldToSaveConcat, $separator, false, false]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
