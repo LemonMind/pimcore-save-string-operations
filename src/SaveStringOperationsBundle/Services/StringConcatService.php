@@ -8,77 +8,15 @@ use Exception;
 
 class StringConcatService
 {
-    public static function stringConcat($objectListing, array $fields, string $userInput, string|array $fieldToSaveConcat, string $separator, bool $isObjectBrick, bool $isClassificationStore): bool
+    public static function stringConcat($objectListing, array $fields, string $separator): bool
     {
         foreach ($objectListing as $object) {
             try {
                 $object::setGetInheritedValues(true);
-                $fieldsValues = [0 => '', 1 => ''];
-                $objectBrickKey = [];
+                $field_one = self::getValueFromField($object, $fields[0]);
+                $field_two = self::getValueFromField($object, $fields[1]);
 
-                if ($isObjectBrick) {
-                    $objectBrickKey = self::objectBrickKey((array)$object->get('o_class'), $fields, $fieldToSaveConcat);
-
-                    if ('' !== $objectBrickKey[0]) {
-                        if (null === $object->get($objectBrickKey[0])->get($fields[0][0])) {
-                            continue;
-                        }
-                        $fieldsValues[0] = $object->get($objectBrickKey[0])->get($fields[0][0])->get($fields[0][1]);
-                    }
-
-                    if ('' !== $objectBrickKey[1]) {
-                        if (null === $object->get($objectBrickKey[1])->get($fields[1][0])) {
-                            continue;
-                        }
-                        $fieldsValues[1] = $object->get($objectBrickKey[1])->get($fields[1][0])->get($fields[1][1]);
-                    }
-                } elseif ($isClassificationStore) {
-                    if ('classificationstore' === $fields[0][1]) {
-                        $firstFieldItems = $object->get($fields[0][2])->getItems();
-                        $firstFieldKeys = explode('-', $fields[0][3]);
-                        $fieldsValues[0] = $firstFieldItems[$firstFieldKeys[0]][$firstFieldKeys[1]]['default'];
-                    }
-
-                    if ('classificationstore' === $fields[1][1]) {
-                        $secondFieldItems = $object->get($fields[1][2])->getItems();
-                        $secondFieldKeys = explode('-', $fields[1][3]);
-                        $fieldsValues[1] = $secondFieldItems[$secondFieldKeys[0]][$secondFieldKeys[1]]['default'];
-                    }
-
-                    if ('classificationstore' === $fieldToSaveConcat[1]) {
-                        $fieldToSaveItems = $object->get($fieldToSaveConcat[2])->getItems();
-                        $fieldToSaveKeys = explode('-', $fieldToSaveConcat[3]);
-                    }
-                }
-                if ('' !== $userInput) {
-                    if ('input' === $fields[0]) {
-                        $fieldsValues[0] = $userInput;
-                    } else {
-                        $fieldsValues[1] = $userInput;
-                    }
-                }
-
-                if ('' === $fieldsValues[0]) {
-                    $fieldsValues[0] = $object->get($fields[0]);
-                }
-                if ('' === $fieldsValues[1]) {
-                    $fieldsValues[1] = $object->get($fields[1]);
-                }
-
-                $field = strip_tags($fieldsValues[0]) . $separator . strip_tags($fieldsValues[1]);
-
-                if (is_array($fieldToSaveConcat)) {
-                    if ('classificationstore' === $fieldToSaveConcat[1]) {
-                        if (isset($fieldToSaveItems) && isset($fieldToSaveKeys)) {
-                            $fieldToSaveItems[$fieldToSaveKeys[0]][$fieldToSaveKeys[1]]['default'] = $field;
-                            $object->get($fieldToSaveConcat[2])->setItems($fieldToSaveItems);
-                        }
-                    } else {
-                        $object->get($objectBrickKey['save'])->get($fieldToSaveConcat[0])->set($fieldToSaveConcat[1], $field);
-                    }
-                } else {
-                    $object->set($fieldToSaveConcat, $field);
-                }
+                self::saveValueToField($object, $fields[2], $field_one . $separator . $field_two);
                 $object->save();
             } catch (Exception $e) {
                 return false;
@@ -88,30 +26,69 @@ class StringConcatService
         return true;
     }
 
-    private static function objectBrickKey(array $objectClassToArray, array $fields, string|array $fieldToSaveConcat): array
+    private static function getObjectBrickKey($object, array $field): string
     {
-        $objectBrickKey = [0 => '', 1 => '', 'save' => ''];
+        $objectClassToArray = (array) $object->get('o_class');
 
         foreach ($objectClassToArray['fieldDefinitions'] as $key => $value) {
-            $valueToArray = (array)$value;
+            $valueToArray = (array) $value;
 
             if ('objectbricks' === $valueToArray['fieldtype']) {
-                if (in_array($fields[0][0], $valueToArray['allowedTypes'], true)) {
-                    $objectBrickKey[0] = $key;
-                }
-
-                if (in_array($fields[1][0], $valueToArray['allowedTypes'], true)) {
-                    $objectBrickKey[1] = $key;
-                }
-
-                if (is_array($fieldToSaveConcat)) {
-                    if (in_array($fieldToSaveConcat[0], $valueToArray['allowedTypes'], true)) {
-                        $objectBrickKey['save'] = $key;
-                    }
+                if (in_array($field['value'][0], $valueToArray['allowedTypes'], true)) {
+                    return $key;
                 }
             }
         }
+    }
 
-        return $objectBrickKey;
+    private static function getValueFromField($object, array $field): string
+    {
+        switch ($field['type']) {
+            case 'string':
+                return $object->get($field['value']);
+
+                break;
+            case 'input':
+                return $field['value'];
+
+                break;
+            case 'store':
+                $keys = explode('-', $field['value'][3]);
+
+                return $object->get($field['value'][2])->getLocalizedKeyValue(intval($keys[0]), intval($keys[1]));
+
+                break;
+            case 'brick':
+                $key = self::getObjectBrickKey($object, $field);
+
+                return $object->get($key)->get($field['value'][0])->get($field['value'][1]);
+
+                break;
+            default:
+                throw new Exception('Type' . $field['type'] . 'is not supported');
+        }
+    }
+
+    private static function saveValueToField($object, array $field, string $newValue): void
+    {
+        switch ($field['type']) {
+            case 'string':
+            case 'input':
+                $object->set($field['value'], $newValue);
+
+                break;
+            case 'store':
+                $keys = explode('-', $field['value'][3]);
+                $object->get($field['value'][2])->setLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $newValue);
+
+                break;
+            case 'brick':
+                $key = self::getObjectBrickKey($object, $field);
+                $object->get($key)->get($field['value'][0])->get($field['value'][1]);
+
+                break;
+            default:
+                throw new Exception('Type' . $field['type'] . 'is not supported');
+        }
     }
 }

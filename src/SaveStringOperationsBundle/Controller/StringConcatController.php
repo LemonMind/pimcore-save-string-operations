@@ -17,12 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class StringConcatController extends AdminController
 {
     private array $fields;
-    private string $userInput;
-    private string|array $fieldToSaveConcat;
     private string $separator;
     private string $class;
-    private bool $isObjectBrick = false;
-    private bool $isClassificationStore = false;
     private array $ids;
 
     /**
@@ -36,11 +32,7 @@ class StringConcatController extends AdminController
         $success = StringConcatService::stringConcat(
             $objectListing,
             $this->fields,
-            $this->userInput,
-            $this->fieldToSaveConcat,
-            $this->separator,
-            $this->isObjectBrick,
-            $this->isClassificationStore
+            $this->separator
         );
 
         return $this->returnAction($success, '');
@@ -56,11 +48,7 @@ class StringConcatController extends AdminController
         $success = StringConcatService::stringConcat(
             $objectListing,
             $this->fields,
-            $this->userInput,
-            $this->fieldToSaveConcat,
-            $this->separator,
-            $this->isObjectBrick,
-            $this->isClassificationStore,
+            $this->separator
         );
 
         return $this->returnAction($success, '');
@@ -71,47 +59,30 @@ class StringConcatController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->fields[] = $request->get('field_one');
-        $this->fields[] = $request->get('field_two');
-        $this->fieldToSaveConcat = $request->get('field_save');
-        $this->userInput = '';
+        foreach ([$request->get('field_one'), $request->get('field_two'), $request->get('field_save')] as $value) {
+            if (str_contains($value, '~')) {
+                $value = explode('~', $value);
 
-        if (str_contains($this->fields[0], '~')) {
-            $this->fields[0] = explode('~', $this->fields[0]);
+                if ('classificationstore' === $value[1]) {
+                    $this->fields[] = ['type' => 'store', 'value' => $value];
+                } else {
+                    $this->fields[] = ['type' => 'brick', 'value' => $value];
+                }
 
-            if ('classificationstore' == $this->fields[0][1]) {
-                $this->isClassificationStore = true;
-            } else {
-                $this->isObjectBrick = true;
+                continue;
             }
+
+            $this->fields[] = ['type' => 'string', 'value' => $value];
         }
 
-        if (str_contains($this->fields[1], '~')) {
-            $this->fields[1] = explode('~', $this->fields[1]);
-
-            if ('classificationstore' == $this->fields[1][1]) {
-                $this->isClassificationStore = true;
-            } else {
-                $this->isObjectBrick = true;
-            }
+        if ('input' === $this->fields[0]['value']) {
+            $this->fields[0]['value'] = $request->get('input_one');
+            $this->fields[0]['type'] = 'input';
         }
 
-        if (str_contains($this->fieldToSaveConcat, '~')) {
-            $this->fieldToSaveConcat = explode('~', $this->fieldToSaveConcat);
-
-            if ('classificationstore' == $this->fieldToSaveConcat[1]) {
-                $this->isClassificationStore = true;
-            } else {
-                $this->isObjectBrick = true;
-            }
-        }
-
-        if ('input' === $this->fields[0]) {
-            $this->userInput = $request->get('input_one');
-        }
-
-        if ('input' === $this->fields[1]) {
-            $this->userInput = $request->get('input_two');
+        if ('input' === $this->fields[1]['value']) {
+            $this->fields[1]['value'] = $request->get('input_two');
+            $this->fields[1]['type'] = 'input';
         }
 
         $this->separator = $request->get('separator');
