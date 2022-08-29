@@ -29,7 +29,7 @@ class StringConcatServiceTest extends KernelTestCase
         $objectListing = [];
 
         for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject($name, $description);
+            $objectListing[] = new TestObject($name, $description, 0);
         }
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringConcatService');

@@ -19,9 +19,9 @@ class StringReplaceServiceTest extends KernelTestCase
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {
         for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject($name, '');
+            $objectListing[] = new TestObject($name, '', 0);
         }
-        $objectListing[] = new TestObject('different name', '');
+        $objectListing[] = new TestObject('different name', '', 0);
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService');
         $method = $reflector->getMethod('stringReplace');

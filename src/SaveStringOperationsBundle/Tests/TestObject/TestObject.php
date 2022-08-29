@@ -8,32 +8,44 @@ class TestObject
 {
     private string $name;
     private string $description;
+    private float $price;
 
-    public function __construct(string $name, string $description)
+    public function __construct(string $name, string $description, float $price)
     {
         $this->name = $name;
         $this->description = $description;
+        $this->price = $price;
     }
 
-    public function get(string $field): string
+    public function get(string $field): string|float
     {
         if ('name' === $field) {
             return $this->name;
         }
 
-        return $this->description;
+        if ('description' === $field) {
+            return $this->description;
+        }
+
+        return $this->price;
     }
 
-    public function set(string $field, string $text): void
+    public function set(string $field, mixed $value): void
     {
         if ('name' === $field) {
-            $this->name = $text;
+            $this->name = $value;
+        } elseif ('description' === $field) {
+            $this->description = $value;
         } else {
-            $this->description = $text;
+            $this->price = $value;
         }
     }
 
     public function save(): void
+    {
+    }
+
+    public static function setGetInheritedValues(bool $value): void
     {
     }
 }
