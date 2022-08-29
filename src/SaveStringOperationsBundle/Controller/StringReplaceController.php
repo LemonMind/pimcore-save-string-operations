@@ -21,6 +21,7 @@ class StringReplaceController extends AdminController
     private string $replace;
     private bool $isInsensitive;
     private bool $isObjectBrick = false;
+    private bool $isClassificationStore = false;
     private string $class;
     private array $ids;
 
@@ -38,7 +39,8 @@ class StringReplaceController extends AdminController
             $this->search,
             $this->replace,
             $this->isInsensitive,
-            $this->isObjectBrick
+            $this->isObjectBrick,
+            $this->isClassificationStore
         );
 
         return $this->returnAction($success, '');
@@ -57,7 +59,8 @@ class StringReplaceController extends AdminController
             $this->search,
             $this->replace,
             $this->isInsensitive,
-            $this->isObjectBrick
+            $this->isObjectBrick,
+            $this->isClassificationStore
         );
 
         return $this->returnAction($success, '');
@@ -75,7 +78,12 @@ class StringReplaceController extends AdminController
 
         if (str_contains($this->field[0], '~')) {
             $this->field = explode('~', $this->field[0]);
-            $this->isObjectBrick = true;
+
+            if ('classificationstore' === $this->field[1]) {
+                $this->isClassificationStore = true;
+            } else {
+                $this->isObjectBrick = true;
+            }
         }
 
         if ('' === $className) {

@@ -8,12 +8,13 @@ use Exception;
 
 class StringReplaceService
 {
-    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive, bool $isObjectBrick): bool
+    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive, bool $isObjectBrick, bool $isClassificationStore): bool
     {
         foreach ($objectListing as $object) {
             try {
                 $object::setGetInheritedValues(true);
                 $objectBrickKey = ' ';
+                $keys = [];
 
                 if ($isObjectBrick) {
                     $objectBrickKey = ObjectBrickService::objectBrickKey($object, $field);
@@ -22,6 +23,9 @@ class StringReplaceService
                         continue;
                     }
                     $productField = $object->get($objectBrickKey)->get($field[0])->get($field[1]);
+                } elseif ($isClassificationStore) {
+                    $keys = explode('-', $field[3]);
+                    $productField = $object->get($field[2])->getLocalizedKeyValue(intval($keys[0]), intval($keys[1]));
                 } else {
                     $productField = $object->get($field[0]);
                 }
@@ -36,6 +40,8 @@ class StringReplaceService
                     if (0 != strcasecmp($productFieldReplaced, $productField)) {
                         if ($isObjectBrick) {
                             $object->get($objectBrickKey)->get($field[0])->set($field[1], $productFieldReplaced);
+                        } elseif ($isClassificationStore) {
+                            $object->get($field[2])->setLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $productFieldReplaced);
                         } else {
                             $object->set($field[0], $productFieldReplaced);
                         }
