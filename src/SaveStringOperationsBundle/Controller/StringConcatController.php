@@ -22,6 +22,7 @@ class StringConcatController extends AdminController
     private string $separator;
     private string $class;
     private bool $isObjectBrick = false;
+    private bool $isClassificationStore = false;
     private array $ids;
 
     /**
@@ -38,7 +39,9 @@ class StringConcatController extends AdminController
             $this->userInput,
             $this->fieldToSaveConcat,
             $this->separator,
-            $this->isObjectBrick);
+            $this->isObjectBrick,
+            $this->isClassificationStore
+        );
 
         return $this->returnAction($success, '');
     }
@@ -56,7 +59,9 @@ class StringConcatController extends AdminController
             $this->userInput,
             $this->fieldToSaveConcat,
             $this->separator,
-            $this->isObjectBrick);
+            $this->isObjectBrick,
+            $this->isClassificationStore,
+        );
 
         return $this->returnAction($success, '');
     }
@@ -73,17 +78,32 @@ class StringConcatController extends AdminController
 
         if (str_contains($this->fields[0], '~')) {
             $this->fields[0] = explode('~', $this->fields[0]);
-            $this->isObjectBrick = true;
+
+            if ('classificationstore' == $this->fields[0][1]) {
+                $this->isClassificationStore = true;
+            } else {
+                $this->isObjectBrick = true;
+            }
         }
 
         if (str_contains($this->fields[1], '~')) {
             $this->fields[1] = explode('~', $this->fields[1]);
-            $this->isObjectBrick = true;
+
+            if ('classificationstore' == $this->fields[1][1]) {
+                $this->isClassificationStore = true;
+            } else {
+                $this->isObjectBrick = true;
+            }
         }
 
         if (str_contains($this->fieldToSaveConcat, '~')) {
             $this->fieldToSaveConcat = explode('~', $this->fieldToSaveConcat);
-            $this->isObjectBrick = true;
+
+            if ('classificationstore' == $this->fieldToSaveConcat[1]) {
+                $this->isClassificationStore = true;
+            } else {
+                $this->isObjectBrick = true;
+            }
         }
 
         if ('input' === $this->fields[0]) {
