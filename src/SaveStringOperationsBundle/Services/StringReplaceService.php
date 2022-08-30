@@ -15,7 +15,7 @@ class StringReplaceService
                 $object::setGetInheritedValues(true);
                 $productField = ObjectOperationsService::getValueFromField($object, $field[0]);
 
-                if (is_null($productField)) {
+                if (!is_string($productField)) {
                     continue;
                 }
 
