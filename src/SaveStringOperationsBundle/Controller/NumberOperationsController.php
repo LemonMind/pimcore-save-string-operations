@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,32 +66,13 @@ class NumberOperationsController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
+        $field = $request->get('field');
         $this->setTo = $request->get('set_to');
         $this->value = (float) $request->get('value');
         $className = $request->get('className');
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
 
-        foreach ([$request->get('field')] as $value) {
-            if (str_contains($value, '~')) {
-                $value = explode('~', $value);
-
-                if ('classificationstore' === $value[1]) {
-                    $this->fields[] = ['type' => 'store', 'value' => $value];
-                } else {
-                    $this->fields[] = ['type' => 'brick', 'value' => $value];
-                }
-
-                continue;
-            }
-
-            if (is_numeric($value)) {
-                $this->fields[] = ['type' => 'number', 'value' => $value];
-
-                continue;
-            }
-
-            $this->fields[] = ['type' => 'string', 'value' => $value];
-        }
+        $this->fields = ControllerService::getFields([$field]);
 
         if ('percentage' === $this->setTo) {
             $this->changeType = $request->get('change_type');
