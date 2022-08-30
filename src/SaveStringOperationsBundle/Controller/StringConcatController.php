@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\StringConcatService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,21 +60,12 @@ class StringConcatController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        foreach ([$request->get('field_one'), $request->get('field_two'), $request->get('field_save')] as $value) {
-            if (str_contains($value, '~')) {
-                $value = explode('~', $value);
+        $fields = [];
+        $fields[] = $request->get('field_one');
+        $fields[] = $request->get('field_two');
+        $fields[] = $request->get('field_save');
 
-                if ('classificationstore' === $value[1]) {
-                    $this->fields[] = ['type' => 'store', 'value' => $value];
-                } else {
-                    $this->fields[] = ['type' => 'brick', 'value' => $value];
-                }
-
-                continue;
-            }
-
-            $this->fields[] = ['type' => 'string', 'value' => $value];
-        }
+        $this->fields = ControllerService::getFields($fields);
 
         if ('input' === $this->fields[0]['value']) {
             $this->fields[0]['value'] = $request->get('input_one');

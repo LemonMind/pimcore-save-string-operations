@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class StringReplaceController extends AdminController
 {
-    private array $field;
+    private array $fields;
     private string $search;
     private string $replace;
     private bool $isInsensitive;
@@ -33,7 +34,7 @@ class StringReplaceController extends AdminController
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
         $success = StringReplaceService::stringReplace(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->search,
             $this->replace,
             $this->isInsensitive
@@ -51,7 +52,7 @@ class StringReplaceController extends AdminController
         $objectListing = new $this->class();
         $success = StringReplaceService::stringReplace(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->search,
             $this->replace,
             $this->isInsensitive
@@ -65,22 +66,12 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $value = $request->get('field');
+        $field = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
 
-        if (str_contains($value, '~')) {
-            $value = explode('~', $value);
-
-            if ('classificationstore' === $value[1]) {
-                $this->field[] = ['type' => 'store', 'value' => $value];
-            } else {
-                $this->field[] = ['type' => 'brick', 'value' => $value];
-            }
-        } else {
-            $this->field[] = ['type' => 'string', 'value' => $value];
-        }
+        $this->fields = ControllerService::getFields([$field]);
 
         if ('' === $className) {
             throw new Exception('Class name is not defined');
