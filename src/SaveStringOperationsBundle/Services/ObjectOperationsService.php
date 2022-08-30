@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lemonmind\SaveStringOperationsBundle\Services;
 
 use Exception;
 
 class ObjectOperationsService
 {
-    public static function getValueFromField($object, array $field): string|null
+    public static function getValueFromField($object, array $field): string|int|float|null
     {
         switch ($field['type']) {
             case 'string':
+            case 'number':
                 return $object->get($field['value']);
             case 'input':
                 return $field['value'];
@@ -32,11 +35,12 @@ class ObjectOperationsService
         }
     }
 
-    public static function saveValueToField($object, array $field, string $newValue): void
+    public static function saveValueToField($object, array $field, mixed $newValue): void
     {
         switch ($field['type']) {
             case 'string':
             case 'input':
+            case 'number':
                 $object->set($field['value'], $newValue);
 
                 break;
@@ -58,10 +62,10 @@ class ObjectOperationsService
     public static function getObjectBrickKey($object, array $field): string
     {
         $objectBrickKey = '';
-        $objectClassToArray = (array)$object->get('o_class');
+        $objectClassToArray = (array) $object->get('o_class');
 
         foreach ($objectClassToArray['fieldDefinitions'] as $key => $value) {
-            $valueToArray = (array)$value;
+            $valueToArray = (array) $value;
 
             if ('objectbricks' === $valueToArray['fieldtype']) {
                 if (in_array($field['value'][0], $valueToArray['allowedTypes'], true)) {
