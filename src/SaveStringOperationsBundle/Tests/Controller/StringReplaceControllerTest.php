@@ -19,6 +19,7 @@ class StringReplaceControllerTest extends KernelTestCase
      */
     public function testGetParams(
         string $field,
+        array $expectedField,
         string $search,
         string $replace,
         string $className,
@@ -40,7 +41,7 @@ class StringReplaceControllerTest extends KernelTestCase
         $method = $reflector->getMethod('getParams');
         $method->invokeArgs($controller, [$request, true]);
         /* @phpstan-ignore-next-line */
-        $this->assertSame([$field], $reflector->getProperty('field')->getValue($controller));
+        $this->assertSame($expectedField, $reflector->getProperty('field')->getValue($controller));
         /* @phpstan-ignore-next-line */
         $this->assertSame($search, $reflector->getProperty('search')->getValue($controller));
         /* @phpstan-ignore-next-line */
@@ -54,8 +55,10 @@ class StringReplaceControllerTest extends KernelTestCase
     public function dataProviderParams(): array
     {
         return [
-            ['name', 'lorem', 'ipsum', 'TestObject', "\Pimcore\Model\DataObject\TestObject\Listing", '1,2,3,4', ['1', '2', '3', '4'], null, false],
-            ['name', 'lorem', 'ipsum', 'TestObject', "\Pimcore\Model\DataObject\TestObject\Listing", '', [], '1', true],
+            ['name', [['type' => 'string', 'value' => 'name']], 'lorem', 'ipsum', 'TestObject',
+                "\Pimcore\Model\DataObject\TestObject\Listing", '1,2,3,4', ['1', '2', '3', '4'], null, false, ],
+            ['name', [['type' => 'string', 'value' => 'name']], 'lorem', 'ipsum', 'TestObject',
+                "\Pimcore\Model\DataObject\TestObject\Listing", '', [], '1', true, ],
         ];
     }
 }
