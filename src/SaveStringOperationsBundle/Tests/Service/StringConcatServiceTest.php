@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
+use Lemonmind\SaveStringOperationsBundle\Services\StringConcatService;
 use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
@@ -20,9 +21,7 @@ class StringConcatServiceTest extends KernelTestCase
         string $name,
         string $description,
         array $fields,
-        string $userInput,
         string $separator,
-        string $fieldToSaveConcat,
         string $expected,
         int $productNumber
     ): void {
@@ -34,29 +33,45 @@ class StringConcatServiceTest extends KernelTestCase
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringConcatService');
         $method = $reflector->getMethod('stringConcat');
-        $method->invokeArgs(null, [$objectListing, $fields, $userInput, $fieldToSaveConcat, $separator, false, false]);
+
+
+        $method->invokeArgs(null, [$objectListing, $fields, $separator]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
-            $this->assertEquals($expected, $objectListing[$i]->get($fieldToSaveConcat));
+            $this->assertEquals($expected, $objectListing[$i]->get($fields[2]['value']));
         }
     }
 
     public function dataProvider(): array
     {
+        //  $name, $description $fields, $separator, $expected, $productNumber
         return [
-            ['lorem', 'some text', ['name', 'description'], '', ' ', 'name', 'lorem some text', 1],
-            ['lorem', 'some text', ['name', 'description'], '', ' ', 'name', 'lorem some text', 10],
-            ['lorem', 'some text', ['name', 'description'], '', ' ', 'description', 'lorem some text', 1],
-            ['lorem', 'some text', ['name', 'description'], '', ' ', 'description', 'lorem some text', 10],
-            ['lorem', 'some text', ['description', 'name'], '', ' ', 'name', 'some text lorem', 1],
-            ['lorem', 'some text', ['description', 'name'], '', ' ', 'name', 'some text lorem', 10],
-            ['lorem', 'some text', ['name', 'description'], '', ',', 'name', 'lorem,some text', 1],
-            ['lorem', 'some text', ['name', 'description'], '', ',', 'name', 'lorem,some text', 10],
-            ['lorem', 'some text', ['input', 'description'], 'input text', ' ', 'description', 'input text some text', 1],
-            ['lorem', 'some text', ['input', 'description'], 'input text', ' ', 'description', 'input text some text', 10],
-            ['lorem', 'some text', ['name', 'input'], 'input text', ' ', 'name', 'lorem input text', 1],
-            ['lorem', 'some text', ['name', 'input'], 'input text', ' ', 'name', 'lorem input text', 10],
+            ['', '', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', '', 10],
+            ['lorem', '', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'lorem', 10],
+            ['', 'ipsum', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'ipsum', 10],
+            ['lorem', 'ipsum', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'loremipsum', 10],
+            ['lorem', 'ipsum', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], ';', 'lorem;ipsum', 10],
         ];
     }
 }
