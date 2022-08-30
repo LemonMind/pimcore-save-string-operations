@@ -28,7 +28,7 @@ class NumberOperationsService
 
             $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]);
 
-            if (is_null($fieldNumber) || !is_numeric($fieldNumber)) {
+            if (!is_numeric($fieldNumber)) {
                 continue;
             }
 
@@ -44,7 +44,7 @@ class NumberOperationsService
 
             $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]);
 
-            if (is_null($fieldNumber) || !is_numeric($fieldNumber)) {
+            if (!is_numeric($fieldNumber)) {
                 continue;
             }
 

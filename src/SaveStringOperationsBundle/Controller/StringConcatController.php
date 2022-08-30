@@ -36,7 +36,7 @@ class StringConcatController extends AdminController
             $this->separator
         );
 
-        return $this->returnAction($success, '');
+        return ControllerService::returnAction($success, '');
     }
 
     /**
@@ -52,7 +52,7 @@ class StringConcatController extends AdminController
             $this->separator
         );
 
-        return $this->returnAction($success, '');
+        return ControllerService::returnAction($success, '');
     }
 
     /**
@@ -79,33 +79,15 @@ class StringConcatController extends AdminController
 
         $this->separator = $request->get('separator');
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
+
         $className = $request->get('className');
-
-        if ('' === $className) {
-            throw new Exception('Class name is not defined');
-        }
-
-        $prefix = "\Pimcore\Model\DataObject";
-        $suffix = '\Listing';
-
-        $this->class = $prefix . "\\$className" . $suffix;
+        $this->class = ControllerService::getClass($className);
 
         if (!class_exists($this->class)) {
             if ($test) {
                 return;
             }
-            $this->returnAction(false, 'Class does not exist');
+            ControllerService::returnAction(false, 'Class does not exist');
         }
-    }
-
-    private function returnAction(bool $success, string $msg): Response
-    {
-        return $this->json(
-            [
-                'success' => $success,
-                'msg' => $msg,
-            ],
-            $success ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST
-        );
     }
 }
