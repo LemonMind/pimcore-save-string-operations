@@ -32,8 +32,8 @@ class StringReplaceControllerTest extends KernelTestCase
         /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
         $request->method('get')
-            ->withConsecutive(['field'], ['search'], ['replace'], ['className'], ['idList'], ['insensitive'])
-            ->willReturnOnConsecutiveCalls($field, $search, $replace, $className, $idList, $insensitive);
+            ->withConsecutive(['field'], ['search'], ['replace'], ['idList'], ['insensitive'], ['className'])
+            ->willReturnOnConsecutiveCalls($field, $search, $replace, $idList, $insensitive, $className);
 
         $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
