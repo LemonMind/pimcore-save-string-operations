@@ -20,6 +20,9 @@ class StringConcatService
                     continue;
                 }
 
+                $field_one = strip_tags($field_one);
+                $field_two = strip_tags($field_two);
+
                 ObjectOperationsService::saveValueToField($object, $fields[2], $field_one . $separator . $field_two);
                 $object->save();
             } catch (Exception $e) {
