@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
 use Exception;
+use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService;
 use Pimcore\Bundle\AdminBundle\Controller\AdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +17,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class StringReplaceController extends AdminController
 {
-    private array $field;
+    private array $fields;
     private string $search;
     private string $replace;
     private bool $isInsensitive;
-    private bool $isObjectBrick = false;
     private string $class;
     private array $ids;
 
@@ -34,14 +34,13 @@ class StringReplaceController extends AdminController
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
         $success = StringReplaceService::stringReplace(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->search,
             $this->replace,
-            $this->isInsensitive,
-            $this->isObjectBrick
+            $this->isInsensitive
         );
 
-        return $this->returnAction($success, '');
+        return ControllerService::returnAction($success, '');
     }
 
     /**
@@ -53,14 +52,13 @@ class StringReplaceController extends AdminController
         $objectListing = new $this->class();
         $success = StringReplaceService::stringReplace(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->search,
             $this->replace,
-            $this->isInsensitive,
-            $this->isObjectBrick
+            $this->isInsensitive
         );
 
-        return $this->returnAction($success, '');
+        return ControllerService::returnAction($success, '');
     }
 
     /**
@@ -68,43 +66,22 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field[] = $request->get('field');
+        $field = $request->get('field');
+        $this->fields = ControllerService::getFields([$field]);
+
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
-        $className = $request->get('className');
-
-        if (str_contains($this->field[0], '~')) {
-            $this->field = explode('~', $this->field[0]);
-            $this->isObjectBrick = true;
-        }
-
-        if ('' === $className) {
-            throw new Exception('Class name is not defined');
-        }
-
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
         $this->isInsensitive = null !== $request->get('insensitive');
 
-        $prefix = "\Pimcore\Model\DataObject";
-        $suffix = '\Listing';
-        $this->class = $prefix . "\\$className" . $suffix;
+        $className = $request->get('className');
+        $this->class = ControllerService::getClass($className);
 
         if (!class_exists($this->class)) {
             if ($test) {
                 return;
             }
-            $this->returnAction(false, 'Class does not exist');
+            ControllerService::returnAction(false, 'Class does not exist');
         }
-    }
-
-    private function returnAction(bool $success, string $msg): Response
-    {
-        return $this->json(
-            [
-                'success' => $success,
-                'msg' => $msg,
-            ],
-            $success ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST
-        );
     }
 }

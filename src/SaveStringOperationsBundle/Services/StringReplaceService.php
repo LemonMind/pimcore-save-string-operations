@@ -8,39 +8,26 @@ use Exception;
 
 class StringReplaceService
 {
-    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive, bool $isObjectBrick): bool
+    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive): bool
     {
         foreach ($objectListing as $object) {
             try {
                 $object::setGetInheritedValues(true);
-                $objectBrickKey = ' ';
+                $productField = ObjectOperationsService::getValueFromField($object, $field[0]);
 
-                if ($isObjectBrick) {
-                    $objectBrickKey = ObjectBrickService::objectBrickKey($object, $field);
-
-                    if (null === $object->get($objectBrickKey)->get($field[0])) {
-                        continue;
-                    }
-                    $productField = $object->get($objectBrickKey)->get($field[0])->get($field[1]);
-                } else {
-                    $productField = $object->get($field[0]);
+                if (!is_string($productField)) {
+                    continue;
                 }
 
-                if (null !== $productField) {
-                    if ($isInsensitive) {
-                        $productFieldReplaced = str_ireplace($search, $replace, $productField);
-                    } else {
-                        $productFieldReplaced = str_replace($search, $replace, $productField);
-                    }
+                if ($isInsensitive) {
+                    $productFieldReplaced = str_ireplace($search, $replace, $productField);
+                } else {
+                    $productFieldReplaced = str_replace($search, $replace, $productField);
+                }
 
-                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        if ($isObjectBrick) {
-                            $object->get($objectBrickKey)->get($field[0])->set($field[1], $productFieldReplaced);
-                        } else {
-                            $object->set($field[0], $productFieldReplaced);
-                        }
-                        $object->save();
-                    }
+                if (0 != strcasecmp($productFieldReplaced, $productField)) {
+                    ObjectOperationsService::saveValueToField($object, $field[0], $productFieldReplaced);
+                    $object->save();
                 }
             } catch (Exception $e) {
                 return false;
