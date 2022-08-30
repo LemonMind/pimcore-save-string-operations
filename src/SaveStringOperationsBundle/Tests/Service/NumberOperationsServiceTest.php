@@ -23,7 +23,7 @@ class NumberOperationsServiceTest extends KernelTestCase
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
         $method = $reflector->getMethod('numberOperations');
-        $method->invokeArgs(null, [$objectListing, ['price'], $setTo, $value, 'increase', false, false]);
+        $method->invokeArgs(null, [$objectListing, [['type' => 'number', 'value' => 'price']], $setTo, $value, 'increase']);
 
         /* @phpstan-ignore-next-line */
         $this->assertEquals($expected, $objectListing[0]->get('price'));
@@ -52,7 +52,7 @@ class NumberOperationsServiceTest extends KernelTestCase
         }
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
         $method = $reflector->getMethod('numberReplace');
-        $method->invokeArgs(null, [$objectListing, ['price'], $value, false, false]);
+        $method->invokeArgs(null, [$objectListing, [['type' => 'number', 'value' => 'price']], $value]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
@@ -84,7 +84,7 @@ class NumberOperationsServiceTest extends KernelTestCase
         }
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
         $method = $reflector->getMethod('percentageReplace');
-        $method->invokeArgs(null, [$objectListing, ['price'], $value, $changeType, false, false]);
+        $method->invokeArgs(null, [$objectListing, [['type' => 'number', 'value' => 'price']], $value, $changeType]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
