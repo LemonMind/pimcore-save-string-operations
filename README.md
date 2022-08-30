@@ -4,7 +4,7 @@ It's Pimcore Bundle to replace ,concat strings or change number fields permanent
 replaced strings directly
 in object.
 
-It also supports object bricks
+It supports object bricks and classification store.
 
 ## Installation
 

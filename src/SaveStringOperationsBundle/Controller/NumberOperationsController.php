@@ -16,12 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class NumberOperationsController extends AdminController
 {
-    private array $field;
+    private array $fields;
     private string $setTo;
     private float $value;
     private string $changeType = '';
-    private bool $isObjectBrick = false;
-    private bool $isClassificationStore = false;
     private string $class;
     private array $ids;
 
@@ -35,12 +33,10 @@ class NumberOperationsController extends AdminController
         $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
         $success = NumberOperationsService::numberOperations(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->setTo,
             $this->value,
-            $this->changeType,
-            $this->isObjectBrick,
-            $this->isClassificationStore
+            $this->changeType
         );
 
         return $this->returnAction($success, '');
@@ -55,12 +51,10 @@ class NumberOperationsController extends AdminController
         $objectListing = new $this->class();
         $success = NumberOperationsService::numberOperations(
             $objectListing,
-            $this->field,
+            $this->fields,
             $this->setTo,
             $this->value,
-            $this->changeType,
-            $this->isObjectBrick,
-            $this->isClassificationStore
+            $this->changeType
         );
 
         return $this->returnAction($success, '');
@@ -71,20 +65,31 @@ class NumberOperationsController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field[] = $request->get('field');
         $this->setTo = $request->get('set_to');
         $this->value = (float) $request->get('value');
         $className = $request->get('className');
         $this->ids = array_filter(explode(',', trim($request->get('idList'))));
 
-        if (str_contains($this->field[0], '~')) {
-            $this->field = explode('~', $this->field[0]);
+        foreach ([$request->get('field')] as $value) {
+            if (str_contains($value, '~')) {
+                $value = explode('~', $value);
 
-            if ('classificationstore' === $this->field[1]) {
-                $this->isClassificationStore = true;
-            } else {
-                $this->isObjectBrick = true;
+                if ('classificationstore' === $value[1]) {
+                    $this->fields[] = ['type' => 'store', 'value' => $value];
+                } else {
+                    $this->fields[] = ['type' => 'brick', 'value' => $value];
+                }
+
+                continue;
             }
+
+            if (is_numeric($value)) {
+                $this->fields[] = ['type' => 'number', 'value' => $value];
+
+                continue;
+            }
+
+            $this->fields[] = ['type' => 'string', 'value' => $value];
         }
 
         if ('percentage' === $this->setTo) {
