@@ -8,45 +8,26 @@ use Exception;
 
 class StringReplaceService
 {
-    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive, bool $isObjectBrick, bool $isClassificationStore): bool
+    public static function stringReplace($objectListing, array $field, string $search, string $replace, bool $isInsensitive): bool
     {
         foreach ($objectListing as $object) {
             try {
                 $object::setGetInheritedValues(true);
-                $objectBrickKey = ' ';
-                $keys = [];
+                $productField = ObjectOperationsService::getValueFromField($object, $field[0]);
 
-                if ($isObjectBrick) {
-                    $objectBrickKey = ObjectBrickService::objectBrickKey($object, $field);
-
-                    if (null === $object->get($objectBrickKey)->get($field[0])) {
-                        continue;
-                    }
-                    $productField = $object->get($objectBrickKey)->get($field[0])->get($field[1]);
-                } elseif ($isClassificationStore) {
-                    $keys = explode('-', $field[3]);
-                    $productField = $object->get($field[2])->getLocalizedKeyValue(intval($keys[0]), intval($keys[1]));
-                } else {
-                    $productField = $object->get($field[0]);
+                if (is_null($productField)) {
+                    continue;
                 }
 
-                if (null !== $productField) {
-                    if ($isInsensitive) {
-                        $productFieldReplaced = str_ireplace($search, $replace, $productField);
-                    } else {
-                        $productFieldReplaced = str_replace($search, $replace, $productField);
-                    }
+                if ($isInsensitive) {
+                    $productFieldReplaced = str_ireplace($search, $replace, $productField);
+                } else {
+                    $productFieldReplaced = str_replace($search, $replace, $productField);
+                }
 
-                    if (0 != strcasecmp($productFieldReplaced, $productField)) {
-                        if ($isObjectBrick) {
-                            $object->get($objectBrickKey)->get($field[0])->set($field[1], $productFieldReplaced);
-                        } elseif ($isClassificationStore) {
-                            $object->get($field[2])->setLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $productFieldReplaced);
-                        } else {
-                            $object->set($field[0], $productFieldReplaced);
-                        }
-                        $object->save();
-                    }
+                if (0 != strcasecmp($productFieldReplaced, $productField)) {
+                    ObjectOperationsService::saveValueToField($object, $field[0], $productFieldReplaced);
+                    $object->save();
                 }
             } catch (Exception $e) {
                 return false;

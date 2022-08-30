@@ -20,8 +20,6 @@ class StringReplaceController extends AdminController
     private string $search;
     private string $replace;
     private bool $isInsensitive;
-    private bool $isObjectBrick = false;
-    private bool $isClassificationStore = false;
     private string $class;
     private array $ids;
 
@@ -38,9 +36,7 @@ class StringReplaceController extends AdminController
             $this->field,
             $this->search,
             $this->replace,
-            $this->isInsensitive,
-            $this->isObjectBrick,
-            $this->isClassificationStore
+            $this->isInsensitive
         );
 
         return $this->returnAction($success, '');
@@ -58,9 +54,7 @@ class StringReplaceController extends AdminController
             $this->field,
             $this->search,
             $this->replace,
-            $this->isInsensitive,
-            $this->isObjectBrick,
-            $this->isClassificationStore
+            $this->isInsensitive
         );
 
         return $this->returnAction($success, '');
@@ -71,19 +65,21 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
-        $this->field[] = $request->get('field');
+        $value = $request->get('field');
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');
         $className = $request->get('className');
 
-        if (str_contains($this->field[0], '~')) {
-            $this->field = explode('~', $this->field[0]);
+        if (str_contains($value, '~')) {
+            $value = explode('~', $value);
 
-            if ('classificationstore' === $this->field[1]) {
-                $this->isClassificationStore = true;
+            if ('classificationstore' === $value[1]) {
+                $this->field[] = ['type' => 'store', 'value' => $value];
             } else {
-                $this->isObjectBrick = true;
+                $this->field[] = ['type' => 'brick', 'value' => $value];
             }
+        } else {
+            $this->field[] = ['type' => 'string', 'value' => $value];
         }
 
         if ('' === $className) {
