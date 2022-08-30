@@ -41,7 +41,7 @@ class StringReplaceControllerTest extends KernelTestCase
         $method = $reflector->getMethod('getParams');
         $method->invokeArgs($controller, [$request, true]);
         /* @phpstan-ignore-next-line */
-        $this->assertSame($expectedField, $reflector->getProperty('field')->getValue($controller));
+        $this->assertSame($expectedField, $reflector->getProperty('fields')->getValue($controller));
         /* @phpstan-ignore-next-line */
         $this->assertSame($search, $reflector->getProperty('search')->getValue($controller));
         /* @phpstan-ignore-next-line */
