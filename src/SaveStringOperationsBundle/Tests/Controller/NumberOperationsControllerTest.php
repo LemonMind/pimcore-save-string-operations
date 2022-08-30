@@ -33,12 +33,12 @@ class NumberOperationsControllerTest extends KernelTestCase
 
         if ('value' === $setTo) {
             $request->method('get')
-                ->withConsecutive(['field'], ['set_to'], ['value'], ['className'], ['idList'])
-                ->willReturnOnConsecutiveCalls($field, $setTo, $value, $className, $idList);
+                ->withConsecutive(['field'], ['set_to'], ['value'], ['idList'], ['className'])
+                ->willReturnOnConsecutiveCalls($field, $setTo, $value, $idList, $className);
         } else {
             $request->method('get')
-                ->withConsecutive(['field'], ['set_to'], ['value'], ['className'], ['idList'], ['change_type'])
-                ->willReturnOnConsecutiveCalls($field, $setTo, $value, $className, $idList, $changeType);
+                ->withConsecutive(['field'], ['set_to'], ['value'], ['idList'], ['change_type'], ['className'])
+                ->willReturnOnConsecutiveCalls($field, $setTo, $value, $idList, $changeType, $className);
         }
 
         $controller = new NumberOperationsController();
@@ -47,7 +47,7 @@ class NumberOperationsControllerTest extends KernelTestCase
 
         $method->invokeArgs($controller, [$request, true]);
         /* @phpstan-ignore-next-line */
-        $this->assertSame($expectedField, $reflector->getProperty('field')->getValue($controller));
+        $this->assertSame($expectedField, $reflector->getProperty('fields')->getValue($controller));
         /* @phpstan-ignore-next-line */
         $this->assertSame($setTo, $reflector->getProperty('setTo')->getValue($controller));
 
@@ -69,9 +69,9 @@ class NumberOperationsControllerTest extends KernelTestCase
     public function dataProvider(): array
     {
         return [
-            ['price', ['price'], 'value', '', 100, '', [], 'class', '\Pimcore\Model\DataObject\class\Listing'],
-            ['price', ['price'], 'percentage', 'decrease', 50, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
-            ['price', ['price'], 'percentage', 'increase', 0.12, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price']], 'value', '', 100, '', [], 'class', '\Pimcore\Model\DataObject\class\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price']], 'percentage', 'decrease', 50, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price']], 'percentage', 'increase', 0.12, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
         ];
     }
 }

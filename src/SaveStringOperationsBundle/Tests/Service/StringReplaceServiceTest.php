@@ -25,7 +25,7 @@ class StringReplaceServiceTest extends KernelTestCase
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService');
         $method = $reflector->getMethod('stringReplace');
-        $method->invokeArgs(null, [$objectListing, ['name'], $search, $replace, $isInsensitive, false]);
+        $method->invokeArgs(null, [$objectListing, [['type' => 'string', 'value' => 'name']], $search, $replace, $isInsensitive]);
 
         for ($i = 0; $i < $productNumber - 1; ++$i) {
             /* @phpstan-ignore-next-line */

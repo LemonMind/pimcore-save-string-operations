@@ -20,31 +20,22 @@ class StringConcatControllerTest extends KernelTestCase
     public function testGetParams(
         string $fieldOne,
         string $fieldTwo,
+        string $fieldSave,
+        string $inputOne,
+        string $inputTwo,
         array $expectedFields,
-        string $fieldToSaveConcat,
-        string $input,
         string $separator,
-        string $idList,
-        array $expectedIds,
         string $className,
-        string $expectedClassName
+        string $expectedClassName,
+        string $ids,
+        array $expectedIds
     ): void {
         /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
 
-        if ('input' === $fieldOne) {
-            $request->method('get')
-                ->withConsecutive(['field_one'], ['field_two'], ['field_save'], ['input_one'], ['separator'], ['idList'], ['className'])
-                ->willReturnOnConsecutiveCalls($fieldOne, $fieldTwo, $fieldToSaveConcat, $input, $separator, $idList, $className);
-        } elseif ('input' === $fieldTwo) {
-            $request->method('get')
-                ->withConsecutive(['field_one'], ['field_two'], ['field_save'], ['input_two'], ['separator'], ['idList'], ['className'])
-                ->willReturnOnConsecutiveCalls($fieldOne, $fieldTwo, $fieldToSaveConcat, $input, $separator, $idList, $className);
-        } else {
-            $request->method('get')
-                ->withConsecutive(['field_one'], ['field_two'], ['field_save'], ['separator'], ['idList'], ['className'])
-                ->willReturnOnConsecutiveCalls($fieldOne, $fieldTwo, $fieldToSaveConcat, $separator, $idList, $className);
-        }
+        $request->method('get')
+            ->withConsecutive(['field_one'], ['field_two'], ['field_save'], ['input_one'], ['input_two'], ['separator'], ['idList'], ['className'])
+            ->willReturnOnConsecutiveCalls($fieldOne, $fieldTwo, $fieldSave, $inputOne, $inputTwo, $separator, $ids, $className);
 
         $controller = new StringConcatController();
         $reflector = new ReflectionClass($controller);
@@ -54,24 +45,47 @@ class StringConcatControllerTest extends KernelTestCase
         /* @phpstan-ignore-next-line */
         $this->assertSame($expectedFields, $reflector->getProperty('fields')->getValue($controller));
         /* @phpstan-ignore-next-line */
-        $this->assertSame($fieldToSaveConcat, $reflector->getProperty('fieldToSaveConcat')->getValue($controller));
+        $this->assertSame($separator, $reflector->getProperty('separator')->getValue($controller));
         /* @phpstan-ignore-next-line */
         $this->assertSame($expectedClassName, $reflector->getProperty('class')->getValue($controller));
         /* @phpstan-ignore-next-line */
         $this->assertSame($expectedIds, $reflector->getProperty('ids')->getValue($controller));
-
-        if ('' !== $input) {
-            /* @phpstan-ignore-next-line */
-            $this->assertSame($input, $reflector->getProperty('userInput')->getValue($controller));
-        }
     }
 
     public function dataProviderParams(): array
     {
+        // ['field_one', 'field_two', 'field_save', 'input_one', 'input_two', expected_fields, separator, className, expetedClass, ids, expextedIds]
         return [
-            ['name', 'description', ['name', 'description'], 'name', '', ' ', '', [], 'class', '\Pimcore\Model\DataObject\class\Listing'],
-            ['input', 'description', ['input', 'description'], 'description', 'some text', ',', '1,2,3', ['1', '2', '3'], ' ', '\Pimcore\Model\DataObject\ \Listing'],
-            ['name', 'input', ['name', 'input'], 'name', 'some text', ', ', '1,2,3,4,5', ['1', '2', '3', '4', '5'], 'class', '\Pimcore\Model\DataObject\class\Listing'],
+            ['name', 'description', 'name', '', '', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
+            ['input', 'description', 'name', 'test', '', [
+                ['type' => 'input', 'value' => 'test'],
+                ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
+            ['name', 'input', 'name', '', 'test', [
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'input', 'value' => 'test'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
+            ['input', 'input', 'name', 'test1', 'test2', [
+                ['type' => 'input', 'value' => 'test1'],
+                ['type' => 'input', 'value' => 'test2'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
+            ['TestBrick~testField', 'name', 'name', '', '', [
+                ['type' => 'brick', 'value' => ['TestBrick', 'testField']],
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
+            ['~classificationstore~storeField~1-1', 'name', 'name', '', '', [
+                ['type' => 'store', 'value' => ['', 'classificationstore', 'storeField', '1-1']],
+                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'name'],
+            ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
         ];
     }
 }

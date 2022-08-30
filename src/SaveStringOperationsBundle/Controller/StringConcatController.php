@@ -64,16 +64,18 @@ class StringConcatController extends AdminController
         $fields[] = $request->get('field_one');
         $fields[] = $request->get('field_two');
         $fields[] = $request->get('field_save');
+        $input_one = $request->get('input_one');
+        $input_two = $request->get('input_two');
 
         $this->fields = ControllerService::getFields($fields);
 
         if ('input' === $this->fields[0]['value']) {
-            $this->fields[0]['value'] = $request->get('input_one');
+            $this->fields[0]['value'] = $input_one;
             $this->fields[0]['type'] = 'input';
         }
 
         if ('input' === $this->fields[1]['value']) {
-            $this->fields[1]['value'] = $request->get('input_two');
+            $this->fields[1]['value'] = $input_two;
             $this->fields[1]['type'] = 'input';
         }
 
