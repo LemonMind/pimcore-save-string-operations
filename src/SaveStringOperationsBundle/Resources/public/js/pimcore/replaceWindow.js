@@ -56,6 +56,11 @@ function replaceWindow(title, url, gridStore, data, className, value, showSelect
             xtype: 'hiddenfield',
             name: 'idList',
             value: idList,
+        },
+        {
+            xtype: 'hiddenfield',
+            name: 'language',
+            value: gridStore.proxy.extraParams.language,
         }
         ],
         buttons: [{

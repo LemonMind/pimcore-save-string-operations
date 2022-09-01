@@ -18,6 +18,7 @@ class StringConcatControllerTest extends KernelTestCase
      * @throws \ReflectionException
      */
     public function testGetParams(
+        ?string $language,
         string $fieldOne,
         string $fieldTwo,
         string $fieldSave,
@@ -34,8 +35,8 @@ class StringConcatControllerTest extends KernelTestCase
         $request = $this->createStub(Request::class);
 
         $request->method('get')
-            ->withConsecutive(['field_one'], ['field_two'], ['field_save'], ['input_one'], ['input_two'], ['separator'], ['idList'], ['className'])
-            ->willReturnOnConsecutiveCalls($fieldOne, $fieldTwo, $fieldSave, $inputOne, $inputTwo, $separator, $ids, $className);
+            ->withConsecutive(['language'], ['field_one'], ['field_two'], ['field_save'], ['input_one'], ['input_two'], ['separator'], ['idList'], ['className'])
+            ->willReturnOnConsecutiveCalls($language, $fieldOne, $fieldTwo, $fieldSave, $inputOne, $inputTwo, $separator, $ids, $className);
 
         $controller = new StringConcatController();
         $reflector = new ReflectionClass($controller);
@@ -56,35 +57,35 @@ class StringConcatControllerTest extends KernelTestCase
     {
         // ['field_one', 'field_two', 'field_save', 'input_one', 'input_two', expected_fields, separator, className, expetedClass, ids, expextedIds]
         return [
-            ['name', 'description', 'name', '', '', [
-                ['type' => 'string', 'value' => 'name'],
-                ['type' => 'string', 'value' => 'description'],
-                ['type' => 'string', 'value' => 'name'],
+            ['default', 'name', 'description', 'name', '', '', [
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'description', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
-            ['input', 'description', 'name', 'test', '', [
-                ['type' => 'input', 'value' => 'test'],
-                ['type' => 'string', 'value' => 'description'],
-                ['type' => 'string', 'value' => 'name'],
+            ['default', 'input', 'description', 'name', 'test', '', [
+                ['type' => 'input', 'value' => 'test', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'description', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
-            ['name', 'input', 'name', '', 'test', [
-                ['type' => 'string', 'value' => 'name'],
-                ['type' => 'input', 'value' => 'test'],
-                ['type' => 'string', 'value' => 'name'],
+            ['default', 'name', 'input', 'name', '', 'test', [
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
+                ['type' => 'input', 'value' => 'test', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
-            ['input', 'input', 'name', 'test1', 'test2', [
-                ['type' => 'input', 'value' => 'test1'],
-                ['type' => 'input', 'value' => 'test2'],
-                ['type' => 'string', 'value' => 'name'],
+            ['default', 'input', 'input', 'name', 'test1', 'test2', [
+                ['type' => 'input', 'value' => 'test1', 'language' => 'default'],
+                ['type' => 'input', 'value' => 'test2', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
-            ['TestBrick~testField', 'name', 'name', '', '', [
+            ['default', 'TestBrick~testField', 'name', 'name', '', '', [
                 ['type' => 'brick', 'value' => ['TestBrick', 'testField']],
-                ['type' => 'string', 'value' => 'name'],
-                ['type' => 'string', 'value' => 'name'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
-            ['~classificationstore~storeField~1-1', 'name', 'name', '', '', [
-                ['type' => 'store', 'value' => ['', 'classificationstore', 'storeField', '1-1']],
-                ['type' => 'string', 'value' => 'name'],
-                ['type' => 'string', 'value' => 'name'],
+            ['default', '~classificationstore~storeField~1-1', 'name', 'name', '', '', [
+                ['type' => 'store', 'value' => ['', 'classificationstore', 'storeField', '1-1'], 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
+                ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
         ];
     }

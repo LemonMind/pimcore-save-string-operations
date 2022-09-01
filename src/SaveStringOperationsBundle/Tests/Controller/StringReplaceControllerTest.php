@@ -18,6 +18,7 @@ class StringReplaceControllerTest extends KernelTestCase
      * @throws \ReflectionException
      */
     public function testGetParams(
+        string $language,
         string $field,
         array $expectedField,
         string $search,
@@ -32,8 +33,8 @@ class StringReplaceControllerTest extends KernelTestCase
         /** @phpstan-ignore-next-line */
         $request = $this->createStub(Request::class);
         $request->method('get')
-            ->withConsecutive(['field'], ['search'], ['replace'], ['idList'], ['insensitive'], ['className'])
-            ->willReturnOnConsecutiveCalls($field, $search, $replace, $idList, $insensitive, $className);
+            ->withConsecutive(['language'], ['field'], ['search'], ['replace'], ['idList'], ['insensitive'], ['className'])
+            ->willReturnOnConsecutiveCalls($language, $field, $search, $replace, $idList, $insensitive, $className);
 
         $controller = new StringReplaceController();
         $reflector = new ReflectionClass($controller);
@@ -55,10 +56,16 @@ class StringReplaceControllerTest extends KernelTestCase
     public function dataProviderParams(): array
     {
         return [
-            ['name', [['type' => 'string', 'value' => 'name']], 'lorem', 'ipsum', 'TestObject',
-                "\Pimcore\Model\DataObject\TestObject\Listing", '1,2,3,4', ['1', '2', '3', '4'], null, false, ],
-            ['name', [['type' => 'string', 'value' => 'name']], 'lorem', 'ipsum', 'TestObject',
-                "\Pimcore\Model\DataObject\TestObject\Listing", '', [], '1', true, ],
+            [
+                'default',
+                'name', [['type' => 'string', 'value' => 'name', 'language' => 'default']], 'lorem', 'ipsum', 'TestObject',
+                "\Pimcore\Model\DataObject\TestObject\Listing", '1,2,3,4', ['1', '2', '3', '4'], null, false,
+            ],
+            [
+                'default',
+                'name', [['type' => 'string', 'value' => 'name', 'language' => 'default']], 'lorem', 'ipsum', 'TestObject',
+                "\Pimcore\Model\DataObject\TestObject\Listing", '', [], '1', true,
+            ],
         ];
     }
 }

@@ -92,6 +92,11 @@ function concatWindow(title, url, gridStore, data, allData, className, value, id
             xtype: 'hiddenfield',
             name: 'idList',
             value: idList,
+        },
+        {
+            xtype: 'hiddenfield',
+            name: 'language',
+            value: gridStore.proxy.extraParams.language,
         }
         ],
         buttons: [{

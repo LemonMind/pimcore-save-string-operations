@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ControllerService
 {
-    public static function getFields(array $fieldsArray): array
+    public static function getFields(array $fieldsArray, string $language = 'default'): array
     {
         $fields = [];
 
@@ -19,7 +19,7 @@ class ControllerService
                 $value = explode('~', $value);
 
                 if ('classificationstore' === $value[1]) {
-                    $fields[] = ['type' => 'store', 'value' => $value];
+                    $fields[] = ['type' => 'store', 'value' => $value, 'language' => $language];
                 } else {
                     $fields[] = ['type' => 'brick', 'value' => $value];
                 }
@@ -27,13 +27,7 @@ class ControllerService
                 continue;
             }
 
-            if (is_numeric($value)) {
-                $fields[] = ['type' => 'number', 'value' => $value];
-
-                continue;
-            }
-
-            $fields[] = ['type' => 'string', 'value' => $value];
+            $fields[] = ['type' => 'string', 'value' => $value, 'language' => $language];
         }
 
         return $fields;

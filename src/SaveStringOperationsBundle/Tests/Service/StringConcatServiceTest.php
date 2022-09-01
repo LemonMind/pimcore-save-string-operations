@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
-use Lemonmind\SaveStringOperationsBundle\Services\StringConcatService;
 use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
@@ -33,7 +32,6 @@ class StringConcatServiceTest extends KernelTestCase
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringConcatService');
         $method = $reflector->getMethod('stringConcat');
-
 
         $method->invokeArgs(null, [$objectListing, $fields, $separator]);
 
