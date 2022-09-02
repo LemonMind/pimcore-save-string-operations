@@ -10,18 +10,33 @@ class ObjectOperationsService
 {
     public static function getValueFromField($object, array $field): string|int|float|null
     {
+        $language = $field['language'] ?? 'default';
+        $languages = \Pimcore\Tool::getValidLanguages();
+
+        if (!in_array($language, [...$languages, 'default'], true)) {
+            return null;
+        }
+
         switch ($field['type']) {
             case 'string':
-            case 'number':
-                return $object->get($field['value']);
+                return $object->get($field['value'], 'default' === $language ? '' : $language);
             case 'input':
                 return $field['value'];
             case 'store':
                 $keys = explode('-', $field['value'][3]);
 
-                return $object->get($field['value'][2])->getLocalizedKeyValue(intval($keys[0]), intval($keys[1]));
+                return $object->get($field['value'][2])->getLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $language);
             case 'brick':
                 $key = self::getObjectBrickKey($object, $field);
+
+                if ('' === $key) {
+                    $brickConfig = json_decode(ltrim($field['value'][0], '?'), true);
+
+                    return $object
+                        ->get($brickConfig['fieldname'])
+                        ->get($brickConfig['containerKey'])
+                        ->get($brickConfig['brickfield'], 'default' === $language ? '' : $language);
+                }
 
                 $brick = $object->get($key)->get($field['value'][0]);
 
@@ -37,20 +52,38 @@ class ObjectOperationsService
 
     public static function saveValueToField($object, array $field, mixed $newValue): void
     {
+        $language = $field['language'] ?? 'default';
+        $languages = \Pimcore\Tool::getValidLanguages();
+
+        if (!in_array($language, [...$languages, 'default'], true)) {
+            return;
+        }
+
         switch ($field['type']) {
             case 'string':
             case 'input':
-            case 'number':
-                $object->set($field['value'], $newValue);
+                $object->set($field['value'], $newValue, 'default' === $language ? '' : $language);
 
                 break;
             case 'store':
                 $keys = explode('-', $field['value'][3]);
-                $object->get($field['value'][2])->setLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $newValue);
+                $object->get($field['value'][2])->setLocalizedKeyValue(intval($keys[0]), intval($keys[1]), $newValue, $language);
 
                 break;
             case 'brick':
                 $key = self::getObjectBrickKey($object, $field);
+
+                if ('' === $key) {
+                    $brickConfig = json_decode(ltrim($field['value'][0], '?'), true);
+
+                    $object
+                        ->get($brickConfig['fieldname'])
+                        ->get($brickConfig['containerKey'])
+                        ->set($brickConfig['brickfield'], $newValue, 'default' === $language ? '' : $language);
+
+                    return;
+                }
+
                 $object->get($key)->get($field['value'][0])->set($field['value'][1], $newValue);
 
                 break;

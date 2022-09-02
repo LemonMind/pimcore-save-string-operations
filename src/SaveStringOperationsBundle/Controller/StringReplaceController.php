@@ -66,8 +66,10 @@ class StringReplaceController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
+        $language = $request->get('language');
+
         $field = $request->get('field');
-        $this->fields = ControllerService::getFields([$field]);
+        $this->fields = ControllerService::getFields([$field], $language);
 
         $this->search = $request->get('search');
         $this->replace = $request->get('replace');

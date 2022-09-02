@@ -60,6 +60,8 @@ class StringConcatController extends AdminController
      */
     private function getParams(Request $request, bool $test = false): void
     {
+        $language = $request->get('language');
+
         $fields = [];
         $fields[] = $request->get('field_one');
         $fields[] = $request->get('field_two');
@@ -67,7 +69,7 @@ class StringConcatController extends AdminController
         $input_one = $request->get('input_one');
         $input_two = $request->get('input_two');
 
-        $this->fields = ControllerService::getFields($fields);
+        $this->fields = ControllerService::getFields($fields, $language);
 
         if ('input' === $this->fields[0]['value']) {
             $this->fields[0]['value'] = $input_one;

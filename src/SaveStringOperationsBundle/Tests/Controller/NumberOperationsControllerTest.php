@@ -69,9 +69,9 @@ class NumberOperationsControllerTest extends KernelTestCase
     public function dataProvider(): array
     {
         return [
-            ['price', [['type' => 'string', 'value' => 'price']], 'value', '', 100, '', [], 'class', '\Pimcore\Model\DataObject\class\Listing'],
-            ['price', [['type' => 'string', 'value' => 'price']], 'percentage', 'decrease', 50, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
-            ['price', [['type' => 'string', 'value' => 'price']], 'percentage', 'increase', 0.12, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price', 'language' => 'default']], 'value', '', 100, '', [], 'class', '\Pimcore\Model\DataObject\class\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price', 'language' => 'default']], 'percentage', 'decrease', 50, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
+            ['price', [['type' => 'string', 'value' => 'price', 'language' => 'default']], 'percentage', 'increase', 0.12, '1,2,3', ['1', '2', '3'], 'sometext', '\Pimcore\Model\DataObject\sometext\Listing'],
         ];
     }
 }
