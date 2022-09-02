@@ -21,7 +21,7 @@ class ControllerService
                 if ('classificationstore' === $value[1]) {
                     $fields[] = ['type' => 'store', 'value' => $value, 'language' => $language];
                 } else {
-                    $fields[] = ['type' => 'brick', 'value' => $value];
+                    $fields[] = ['type' => 'brick', 'value' => $value, 'language' => $language];
                 }
 
                 continue;

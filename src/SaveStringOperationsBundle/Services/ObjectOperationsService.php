@@ -29,6 +29,15 @@ class ObjectOperationsService
             case 'brick':
                 $key = self::getObjectBrickKey($object, $field);
 
+                if ('' === $key) {
+                    $brickConfig = json_decode(ltrim($field['value'][0], '?'), true);
+
+                    return $object
+                        ->get($brickConfig['fieldname'])
+                        ->get($brickConfig['containerKey'])
+                        ->get($brickConfig['brickfield'], 'default' === $language ? '' : $language);
+                }
+
                 $brick = $object->get($key)->get($field['value'][0]);
 
                 if (is_null($brick)) {
@@ -63,6 +72,18 @@ class ObjectOperationsService
                 break;
             case 'brick':
                 $key = self::getObjectBrickKey($object, $field);
+
+                if ('' === $key) {
+                    $brickConfig = json_decode(ltrim($field['value'][0], '?'), true);
+
+                    $object
+                        ->get($brickConfig['fieldname'])
+                        ->get($brickConfig['containerKey'])
+                        ->set($brickConfig['brickfield'], $newValue, 'default' === $language ? '' : $language);
+
+                    return;
+                }
+
                 $object->get($key)->get($field['value'][0])->set($field['value'][1], $newValue);
 
                 break;

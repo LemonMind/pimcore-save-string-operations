@@ -78,7 +78,7 @@ class StringConcatControllerTest extends KernelTestCase
                 ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
             ['default', 'TestBrick~testField', 'name', 'name', '', '', [
-                ['type' => 'brick', 'value' => ['TestBrick', 'testField']],
+                ['type' => 'brick', 'value' => ['TestBrick', 'testField'], 'language' => 'default'],
                 ['type' => 'string', 'value' => 'name', 'language' => 'default'],
                 ['type' => 'string', 'value' => 'name', 'language' => 'default'],
             ], '', 'TestClass', '\Pimcore\Model\DataObject\TestClass\Listing', '', []],
