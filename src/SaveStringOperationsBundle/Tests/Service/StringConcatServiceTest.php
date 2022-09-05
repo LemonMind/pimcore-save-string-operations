@@ -4,14 +4,27 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
-use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
-use Pimcore\Test\KernelTestCase;
+use Lemonmind\SaveStringOperationsBundle\Services\ObjectOperationsService;
+use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-class StringConcatServiceTest extends KernelTestCase
+/**
+ * @runInSeparateProcess
+ *
+ * @preserveGlobalState disabled
+ */
+class StringConcatServiceTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Mockery::close();
+    }
+
     /**
      * @test
+     *
      * @dataProvider dataProvider
      *
      * @throws \ReflectionException
@@ -24,11 +37,34 @@ class StringConcatServiceTest extends KernelTestCase
         string $expected,
         int $productNumber
     ): void {
+        $service = Mockery::mock('alias:' . ObjectOperationsService::class);
+
         $objectListing = [];
 
-        for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject($name, $description, 0);
+        for ($i = 0; $i <= $productNumber; ++$i) {
+            $object = new MockObject($name);
+            $objectListing[] = $object;
+
+            /* @phpstan-ignore-next-line */
+            $service->shouldReceive('getValueFromField')
+                ->with($object, $fields[0])
+                ->andReturn($name);
+
+            /* @phpstan-ignore-next-line */
+            $service->shouldReceive('getValueFromField')
+                ->with($object, $fields[1])
+                ->andReturn($description);
         }
+
+        $closure = function ($object, $field, $value) {
+            $object->setValue($value);
+
+            return true;
+        };
+
+        /* @phpstan-ignore-next-line */
+        $service->shouldReceive('saveValueToField')
+            ->withArgs($closure);
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringConcatService');
         $method = $reflector->getMethod('stringConcat');
@@ -37,7 +73,7 @@ class StringConcatServiceTest extends KernelTestCase
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
-            $this->assertEquals($expected, $objectListing[$i]->get($fields[2]['value']));
+            $this->assertEquals($expected, $objectListing[$i]->getValue());
         }
     }
 
@@ -68,6 +104,11 @@ class StringConcatServiceTest extends KernelTestCase
             ['lorem', 'ipsum', [
                 ['type' => 'string', 'value' => 'name'],
                 ['type' => 'string', 'value' => 'description'],
+                ['type' => 'string', 'value' => 'name'],
+            ], ';', 'lorem;ipsum', 10],
+            ['lorem', 'ipsum', [
+                ['type' => 'brick', 'value' => 'name'],
+                ['type' => 'store', 'value' => 'description'],
                 ['type' => 'string', 'value' => 'name'],
             ], ';', 'lorem;ipsum', 10],
         ];

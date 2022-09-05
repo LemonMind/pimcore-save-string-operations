@@ -13,6 +13,7 @@ class StringReplaceControllerTest extends KernelTestCase
 {
     /**
      * @test
+     *
      * @dataProvider dataProviderParams
      *
      * @throws \ReflectionException

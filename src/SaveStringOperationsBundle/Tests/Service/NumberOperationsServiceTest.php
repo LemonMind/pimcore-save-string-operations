@@ -4,101 +4,127 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
-use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
-use Pimcore\Test\KernelTestCase;
+use Lemonmind\SaveStringOperationsBundle\Services\ObjectOperationsService;
+use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-class NumberOperationsServiceTest extends KernelTestCase
+/**
+ * @runInSeparateProcess
+ *
+ * @preserveGlobalState disabled
+ */
+class NumberOperationsServiceTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Mockery::close();
+    }
+
     /**
      * @test
-     * @dataProvider dataProviderNumberOperations
      *
-     * @throws \ReflectionException
-     */
-    public function testNumberOperations(string $setTo, float $value, float $expected): void
-    {
-        $objectListing = [];
-        $objectListing[] = new TestObject('name', '', 100);
-
-        $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
-        $method = $reflector->getMethod('numberOperations');
-        $method->invokeArgs(null, [$objectListing, [['type' => 'string', 'value' => 'price']], $setTo, $value, 'increase']);
-
-        /* @phpstan-ignore-next-line */
-        $this->assertEquals($expected, $objectListing[0]->get('price'));
-    }
-
-    public function dataProviderNumberOperations(): array
-    {
-        return [
-            ['value', 100, 100],
-            ['percentage', 0.1, 110],
-        ];
-    }
-
-    /**
-     * @test
      * @dataProvider dataProviderNumberReplace
      *
      * @throws \ReflectionException
      */
-    public function testNumberReplace(float $value, int $productNumber): void
+    public function testNumberReplace(float $initial, array $field, float $value, float $expected, int $productNumber): void
     {
+        $service = Mockery::mock('alias:' . ObjectOperationsService::class);
+
         $objectListing = [];
 
-        for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject('name', '', 0);
+        for ($i = 0; $i <= $productNumber; ++$i) {
+            $object = new MockObject($initial);
+            $objectListing[] = $object;
+
+            /* @phpstan-ignore-next-line */
+            $service->shouldReceive('getValueFromField')
+                ->with($object, $field)
+                ->andReturn($value);
         }
+
+        $closure = function ($object, $field, $value) {
+            $object->setValue($value);
+
+            return true;
+        };
+
+        /* @phpstan-ignore-next-line */
+        $service->shouldReceive('saveValueToField')
+            ->withArgs($closure);
+
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
         $method = $reflector->getMethod('numberReplace');
-        $method->invokeArgs(null, [$objectListing, [['type' => 'string', 'value' => 'price']], $value]);
+        $method->invokeArgs(null, [$objectListing, [$field], $value]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
-            $this->assertEquals($value, $objectListing[$i]->get('price'));
+            $this->assertEquals($expected, $objectListing[$i]->getValue());
         }
     }
 
     public function dataProviderNumberReplace(): array
     {
         return [
-            [100, 1],
-            [1150, 10],
-            [10.12, 10],
+            [0, ['type' => 'string', 'value' => 'name'], 100, 100, 1],
+            [0, ['type' => 'string', 'value' => 'name'], 100, 100, 10],
+            [0, ['type' => 'brick', 'value' => 'name'], 50, 50, 1],
+            [0, ['type' => 'store', 'value' => 'name'], 50, 50, 1],
         ];
     }
 
     /**
      * @test
+     *
      * @dataProvider dataProviderPercentageReplace
      *
      * @throws \ReflectionException
      */
-    public function testPercentageReplace(float $price, float $value, float $expected, string $changeType, int $productNumber): void
+    public function testPercentageReplace(float $initial, array $field, float $value, string $changeType, float $expected, int $productNumber): void
     {
+        $service = Mockery::mock('alias:' . ObjectOperationsService::class);
+
         $objectListing = [];
 
-        for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject('name', '', $price);
+        for ($i = 0; $i <= $productNumber; ++$i) {
+            $object = new MockObject($initial);
+            $objectListing[] = $object;
+
+            /* @phpstan-ignore-next-line */
+            $service->shouldReceive('getValueFromField')
+                ->with($object, $field)
+                ->andReturn($initial);
         }
+
+        $closure = function ($object, $field, $value) {
+            $object->setValue($value);
+
+            return true;
+        };
+
+        /* @phpstan-ignore-next-line */
+        $service->shouldReceive('saveValueToField')
+            ->withArgs($closure);
+
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService');
         $method = $reflector->getMethod('percentageReplace');
-        $method->invokeArgs(null, [$objectListing, [['type' => 'string', 'value' => 'price']], $value, $changeType]);
+        $method->invokeArgs(null, [$objectListing, [$field], $value, $changeType]);
 
         for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
-            $this->assertEquals($expected, $objectListing[$i]->get('price'));
+            $this->assertEqualsWithDelta($expected, $objectListing[$i]->getValue(), 0.0001);
         }
     }
 
     public function dataProviderPercentageReplace(): array
     {
         return [
-            [100, 0.1, 110, 'increase', 1],
-            [100, 0.1, 90, 'decrease', 1],
-            [200, 0.5, 300, 'increase', 10],
-            [200, 0.5, 100, 'decrease', 10],
+            [100, ['type' => 'string', 'value' => 'name'], 0.1, 'increase', 110, 1],
+            [100, ['type' => 'string', 'value' => 'name'], 0.1, 'increase', 110, 10],
+            [100, ['type' => 'string', 'value' => 'name'], 0.1, 'decrease', 90, 1],
+            [100, ['type' => 'string', 'value' => 'name'], 0.1, 'decrease', 90, 10],
         ];
     }
 }

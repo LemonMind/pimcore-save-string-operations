@@ -4,35 +4,64 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
-use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
-use Pimcore\Test\KernelTestCase;
+use Lemonmind\SaveStringOperationsBundle\Services\ObjectOperationsService;
+use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-class StringReplaceServiceTest extends KernelTestCase
+/**
+ * @runInSeparateProcess
+ *
+ * @preserveGlobalState disabled
+ */
+class StringReplaceServiceTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Mockery::close();
+    }
+
     /**
      * @test
+     *
      * @dataProvider dataProvider
      *
      * @throws \ReflectionException
      */
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {
+        $service = Mockery::mock('alias:' . ObjectOperationsService::class);
+
+        /* @phpstan-ignore-next-line */
+        $service->shouldReceive('getValueFromField')
+            ->andReturn($name);
+
+        $objectListing = [];
+
         for ($i = 0; $i < $productNumber; ++$i) {
-            $objectListing[] = new TestObject($name, '', 0);
+            $object = new MockObject($name);
+            $objectListing[] = $object;
         }
-        $objectListing[] = new TestObject('different name', '', 0);
+
+        $closure = function ($object, $field, $value) {
+            $object->setValue($value);
+
+            return true;
+        };
+
+        /* @phpstan-ignore-next-line */
+        $service->shouldReceive('saveValueToField')
+            ->withArgs($closure);
 
         $reflector = new ReflectionClass('Lemonmind\SaveStringOperationsBundle\Services\StringReplaceService');
         $method = $reflector->getMethod('stringReplace');
         $method->invokeArgs(null, [$objectListing, [['type' => 'string', 'value' => 'name']], $search, $replace, $isInsensitive]);
 
-        for ($i = 0; $i < $productNumber - 1; ++$i) {
+        for ($i = 0; $i < $productNumber; ++$i) {
             /* @phpstan-ignore-next-line */
-            $this->assertEquals($expected, $objectListing[$i]->get('name'));
+            $this->assertEquals($expected, $objectListing[$i]->getValue());
         }
-        /* @phpstan-ignore-next-line */
-        $this->assertEquals('different name', $objectListing[$productNumber]->get('name'));
     }
 
     public function dataProvider(): array
