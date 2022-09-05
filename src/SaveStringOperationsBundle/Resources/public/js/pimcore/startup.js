@@ -4,6 +4,8 @@ const keys = {
     replaceSelected: 'srtingReplaceSelected',
     concatAll: 'srtingConcatenateAll',
     concatSelected: 'srtingConcatenateSelected',
+    caseAll: 'stringCaseConvertAll',
+    caseSelected: 'stringCaseConvertSelected',
     numericSubMenu: 'numericSubMenu',
     changeAll: 'numberChangeAll',
     changeSelected: 'numberChangeSelected',
@@ -229,6 +231,24 @@ const addMenuItemsString = (config) => {
         iconCls: "pimcore_icon_operator_concatenator",
         handler: () => {
             concatWindow('Concatenate all', '/admin/string_concat/all', gridStore, fieldsData, allFieldsData, className, activeHeader, idList)
+        }
+    });
+
+    menu.add({
+        itemId: keys.caseSelected,
+        text: "Case convert selected",
+        iconCls: "pimcore_icon_operator_caseconverter",
+        handler: () => {
+            convertWindow('Concatenate selected', '/admin/string_convert/selected', gridStore, fieldsData, className, activeHeader, idList)
+        }
+    });
+
+    menu.add({
+        itemId: keys.caseAll,
+        text: "Case convert all",
+        iconCls: "pimcore_icon_operator_caseconverter",
+        handler: () => {
+            convertWindow('Concatenate all', '/admin/string_convert/all', gridStore, fieldsData, className, activeHeader, idList)
         }
     });
 
