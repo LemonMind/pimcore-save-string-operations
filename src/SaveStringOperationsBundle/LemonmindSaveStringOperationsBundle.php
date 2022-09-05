@@ -15,6 +15,7 @@ class LemonmindSaveStringOperationsBundle extends AbstractPimcoreBundle
             '/bundles/lemonmindsavestringoperations/js/pimcore/formHandler.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/replaceWindow.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/concatWindow.js',
+            '/bundles/lemonmindsavestringoperations/js/pimcore/convertWindow.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/numericWindow.js',
             '/bundles/lemonmindsavestringoperations/js/pimcore/startup.js',
         ];

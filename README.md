@@ -82,6 +82,33 @@ Fill in all necessary fields and click apply to save changes.
 - Save to
     - Defines where to save concatenate string
 
+## Usage of string convert
+
+As mentioned above you can right-click any row in grid view to select it and bring up a context menu. If you want to
+include multiple rows, select them first and then right click on any of the selected ones.
+
+There are two buttons available:
+
+- String convert selected
+    - Works with filtered view
+- String convert all
+    - Doesn't work with filters; Overwrite the field's data for all objects
+
+After Choosing your desired option a window should appear:
+
+![](docs/string_convert_window.png)
+
+Fill in all necessary fields and click apply to save changes.
+
+### Options details
+
+- Select Field
+    - Field to affect
+    - Shows the fields of type `input`, `textarea`, `wysiwyg`
+    - Shows the fields that are not set as `Not editable` in class definition
+- Capitalization
+    - Type of capitalization conversion
+
 ## Usage of numeric field change
 
 As mentioned above you can right-click any row in grid view to select it and bring up a context menu. If you want to

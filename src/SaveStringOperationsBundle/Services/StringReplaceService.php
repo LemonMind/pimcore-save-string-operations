@@ -25,7 +25,7 @@ class StringReplaceService
                     $productFieldReplaced = str_replace($search, $replace, $productField);
                 }
 
-                if (0 != strcasecmp($productFieldReplaced, $productField)) {
+                if ($productFieldReplaced !== $productField) {
                     ObjectOperationsService::saveValueToField($object, $field[0], $productFieldReplaced);
                     $object->save();
                 }
