@@ -13,6 +13,7 @@ class StringConcatControllerTest extends KernelTestCase
 {
     /**
      * @test
+     *
      * @dataProvider dataProviderParams
      *
      * @throws \ReflectionException

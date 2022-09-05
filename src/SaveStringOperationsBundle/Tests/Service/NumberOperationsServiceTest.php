@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Lemonmind\SaveStringOperationsBundle\Tests\Service;
 
 use Lemonmind\SaveStringOperationsBundle\Services\ObjectOperationsService;
-// use ReflectionClass;
-
 use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
-use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\TestObject;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
