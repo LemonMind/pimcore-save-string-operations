@@ -38,6 +38,8 @@ After Choosing your desired option a window should appear:
 
 Fill in all necessary fields and click apply to save changes.
 
+<span style="color:red">For *wysiwyg* fields, the source code is searched and replaced</span>.
+
 ### Options details
 
 - Select Field
