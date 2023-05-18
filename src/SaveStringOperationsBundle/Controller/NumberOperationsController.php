@@ -7,7 +7,7 @@ namespace Lemonmind\SaveStringOperationsBundle\Controller;
 use Exception;
 use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService;
-use Pimcore\Bundle\AdminBundle\Controller\AdminController;
+use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/number_change")
  */
-class NumberOperationsController extends AdminController
+class NumberOperationsController extends FrontendController
 {
     private array $fields;
     private string $setTo;
@@ -31,7 +31,7 @@ class NumberOperationsController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
+        $objectListing->addConditionParam('id IN (?)', [$this->ids]);
         $success = NumberOperationsService::numberOperations(
             $objectListing,
             $this->fields,

@@ -18,11 +18,11 @@ const rowContextMenuHandler = async (e) => {
     const menu = e.detail.menu
     removeMenuItemsIfPresent(menu)
     const selectedRows = e.detail.selectedRows
-    const gridStore = e.detail.object.store
+    const gridStore = e.detail.grid.store
 
     const className = selectedRows[0].data.classname
 
-    const columns = e.detail.object.columns
+    const columns = e.detail.grid.columns
     const columnsConfig = getColumnsConfig(columns);
 
     (() => {

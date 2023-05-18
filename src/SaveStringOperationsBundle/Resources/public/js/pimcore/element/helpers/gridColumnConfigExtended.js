@@ -140,6 +140,7 @@ pimcore.element.helpers.gridColumnConfigExtended = {
     }
 }
 
-pimcore.element.selector.object.addMethods(pimcore.element.helpers.gridColumnConfigExtended);
+// console.log(pimcore.element.selector.searchFacade);
+pimcore.element.selector.searchFacade.addMethods(pimcore.element.helpers.gridColumnConfigExtended);
 pimcore.object.search.addMethods(pimcore.element.helpers.gridColumnConfigExtended);
 pimcore.object.variantsTab.addMethods(pimcore.element.helpers.gridColumnConfigExtended);

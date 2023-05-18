@@ -7,6 +7,7 @@ namespace Lemonmind\SaveStringOperationsBundle\Tests\Controller;
 use Lemonmind\SaveStringOperationsBundle\Controller\NumberOperationsController;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 
 class NumberOperationsControllerTest extends KernelTestCase
@@ -16,7 +17,7 @@ class NumberOperationsControllerTest extends KernelTestCase
      *
      * @dataProvider dataProvider
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testGetParams(
         string $field,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Services;
 
+use Exception;
+
 class NumberOperationsService
 {
     public static function numberOperations($objectListing, array $fields, string $setTo, float $value, string $changeType): bool
@@ -14,7 +16,7 @@ class NumberOperationsService
             } else {
                 self::percentageReplace($objectListing, $fields, $value, $changeType);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
 

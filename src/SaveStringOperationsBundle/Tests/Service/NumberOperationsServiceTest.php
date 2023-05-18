@@ -9,6 +9,7 @@ use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * @runInSeparateProcess
@@ -27,7 +28,7 @@ class NumberOperationsServiceTest extends TestCase
      *
      * @dataProvider dataProviderNumberReplace
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testNumberReplace(float $initial, array $field, float $value, float $expected, int $productNumber): void
     {
@@ -80,7 +81,7 @@ class NumberOperationsServiceTest extends TestCase
      *
      * @dataProvider dataProviderPercentageReplace
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testPercentageReplace(float $initial, array $field, float $value, string $changeType, float $expected, int $productNumber): void
     {

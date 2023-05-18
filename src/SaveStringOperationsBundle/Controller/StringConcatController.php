@@ -7,7 +7,7 @@ namespace Lemonmind\SaveStringOperationsBundle\Controller;
 use Exception;
 use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\StringConcatService;
-use Pimcore\Bundle\AdminBundle\Controller\AdminController;
+use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/string_concat")
  */
-class StringConcatController extends AdminController
+class StringConcatController extends FrontendController
 {
     private array $fields;
     private string $separator;
@@ -29,7 +29,7 @@ class StringConcatController extends AdminController
     {
         $this->getParams($request);
         $objectListing = new $this->class();
-        $objectListing->addConditionParam('o_id IN (?)', [$this->ids]);
+        $objectListing->addConditionParam('id IN (?)', [$this->ids]);
         $success = StringConcatService::stringConcat(
             $objectListing,
             $this->fields,
