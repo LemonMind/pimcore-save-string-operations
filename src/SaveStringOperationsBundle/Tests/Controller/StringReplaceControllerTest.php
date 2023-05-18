@@ -7,6 +7,7 @@ namespace Lemonmind\SaveStringOperationsBundle\Tests\Controller;
 use Lemonmind\SaveStringOperationsBundle\Controller\StringReplaceController;
 use Pimcore\Test\KernelTestCase;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 
 class StringReplaceControllerTest extends KernelTestCase
@@ -16,7 +17,7 @@ class StringReplaceControllerTest extends KernelTestCase
      *
      * @dataProvider dataProviderParams
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testGetParams(
         string $language,

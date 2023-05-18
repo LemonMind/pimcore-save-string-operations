@@ -9,6 +9,7 @@ use Lemonmind\SaveStringOperationsBundle\Tests\TestObject\MockObject;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * @runInSeparateProcess
@@ -27,7 +28,7 @@ class StringReplaceServiceTest extends TestCase
      *
      * @dataProvider dataProvider
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testStringReplace(string $name, string $search, string $replace, string $expected, bool $isInsensitive, int $productNumber): void
     {

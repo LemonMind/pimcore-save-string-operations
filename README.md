@@ -10,7 +10,12 @@ It supports object bricks and classification store.
 
 ```
 composer require lemonmind/pimcore-save-string-operations
-bin/console pimcore:bundle:enable LemonmindSaveStringOperationsBundle
+```
+
+```php
+// config/bundles.php
+
+LemonmindSaveStringOperationsBundle::class => ['all' => true]
 ```
 
 After correct installation go to your object's folder and right click on one of the objects.

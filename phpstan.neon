@@ -6,5 +6,7 @@ parameters:
     level: 8
     paths:
         - src
+    excludePaths:
+            - src/SaveStringOperationsBundle/Tests/*
     symfony:
         containerXmlPath: ../../var/cache/dev/App_KernelDevDebugContainer.xml
