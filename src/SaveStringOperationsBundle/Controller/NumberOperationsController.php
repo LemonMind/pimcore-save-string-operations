@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lemonmind\SaveStringOperationsBundle\Controller;
 
-use App\Model\Product\Car;
 use Exception;
 use Lemonmind\SaveStringOperationsBundle\Services\ControllerService;
 use Lemonmind\SaveStringOperationsBundle\Services\NumberOperationsService;
