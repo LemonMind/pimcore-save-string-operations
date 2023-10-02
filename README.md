@@ -18,6 +18,10 @@ composer require lemonmind/pimcore-save-string-operations
 LemonmindSaveStringOperationsBundle::class => ['all' => true]
 ```
 
+```
+php bin/console assets:install
+```
+
 After correct installation go to your object's folder and right click on one of the objects.
 Two buttons should appear
 ![](docs/bundle_home.png)
