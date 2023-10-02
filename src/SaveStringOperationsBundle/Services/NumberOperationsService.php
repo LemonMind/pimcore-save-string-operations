@@ -12,6 +12,7 @@ class NumberOperationsService
     {
         try {
             if ('value' === $setTo) {
+                exit('val');
                 self::numberReplace($objectListing, $fields, $value);
             } else {
                 self::percentageReplace($objectListing, $fields, $value, $changeType);
@@ -28,7 +29,7 @@ class NumberOperationsService
         foreach ($objectListing as $object) {
             $object::setGetInheritedValues(true);
 
-            $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]);
+            $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]) ?? 0;
 
             if (!is_numeric($fieldNumber)) {
                 continue;
@@ -44,7 +45,7 @@ class NumberOperationsService
         foreach ($objectListing as $object) {
             $object::setGetInheritedValues(true);
 
-            $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]);
+            $fieldNumber = ObjectOperationsService::getValueFromField($object, $fields[0]) ?? 0;
 
             if (!is_numeric($fieldNumber)) {
                 continue;
