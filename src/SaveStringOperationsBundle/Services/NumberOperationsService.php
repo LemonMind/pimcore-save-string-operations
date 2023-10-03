@@ -12,7 +12,6 @@ class NumberOperationsService
     {
         try {
             if ('value' === $setTo) {
-                exit('val');
                 self::numberReplace($objectListing, $fields, $value);
             } else {
                 self::percentageReplace($objectListing, $fields, $value, $changeType);
