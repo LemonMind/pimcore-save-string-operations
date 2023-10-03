@@ -13,13 +13,15 @@ class StringReplaceService
         foreach ($objectListing as $object) {
             try {
                 $object::setGetInheritedValues(true);
-                $productField = ObjectOperationsService::getValueFromField($object, $field[0]);
+                $productField = ObjectOperationsService::getValueFromField($object, $field[0]) ?? '';
 
                 if (!is_string($productField)) {
                     continue;
                 }
 
-                if ($isInsensitive) {
+                if ($productField === '') {
+                    $productFieldReplaced = $replace;
+                } elseif ($isInsensitive) {
                     $productFieldReplaced = str_ireplace($search, $replace, $productField);
                 } else {
                     $productFieldReplaced = str_replace($search, $replace, $productField);

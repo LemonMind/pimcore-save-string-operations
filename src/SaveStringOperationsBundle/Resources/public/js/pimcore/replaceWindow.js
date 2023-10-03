@@ -30,7 +30,7 @@ function replaceWindow(title, url, gridStore, data, className, value, showSelect
             xtype: 'textfield',
             fieldLabel: 'Search',
             name: 'search',
-            allowBlank: false,
+            allowBlank: true,
             margin: '10'
         },
         {
