@@ -52,7 +52,8 @@ Fill in all necessary fields and click apply to save changes.
     - Shows the fields of type `input`, `textarea`, `wysiwyg`
     - Shows the fields that are not set as `Not editable` in class definition
 - Search
-    - Phrase to search for
+    - Phrase to search for. 
+    - If empty, the value searched for will be NULL
 - Replace
     - Phrase that will replace all matching occurrences of search
 - Insensitive
